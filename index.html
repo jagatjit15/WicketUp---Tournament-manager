@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- title>WicketUp - Cricket Tournament Scorer</!-->
+    <!-- Tailwind CSS for UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: #f3f4f6;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            ring: 2px solid #93c5fd;
+        }
+
+        /* Graphical Bracket Connector Lines */
+        .bracket-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 60px;
+            padding: 40px 0;
+        }
+
+        .playoff-column {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .playoff-svg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* Scoring Grid Styles */
+        .ball-option input[type="radio"] {
+            display: none;
+        }
+
+        .ball-option input[type="checkbox"] {
+            display: none;
+        }
+
+        .ball-option label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background-color: #e5e7eb;
+            color: #374151;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: 2px solid #d1d5db;
+            user-select: none;
+        }
+
+        .ball-option label:hover {
+            background-color: #d1d5db;
+            border-color: #9ca3af;
+            transform: scale(1.05);
+        }
+
+        .ball-option input[type="checkbox"]:checked+label {
+            color: white;
+            transform: scale(1.08);
+        }
+
+        /* Checked state colors for each option */
+        .opt-0 input[type="checkbox"]:checked+label {
+            background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+            color: white;
+            border-color: #166534;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.5);
+        }
+
+        .opt-0 input[type="checkbox"]:checked+label:hover {
+            background: linear-gradient(135deg, #16a34a 0%, #0d6e2a 100%);
+            box-shadow: 0 6px 16px rgba(22, 163, 74, 0.6);
+        }
+
+        .opt-1 input[type="checkbox"]:checked+label {
+            background: linear-gradient(135deg, #eab308 0%, #b45309 100%);
+            color: white;
+            border-color: #92400e;
+            box-shadow: 0 4px 12px rgba(234, 179, 8, 0.5);
+        }
+
+        .opt-1 input[type="checkbox"]:checked+label:hover {
+            background: linear-gradient(135deg, #ca8a04 0%, #8b5e09 100%);
+            box-shadow: 0 6px 16px rgba(202, 138, 4, 0.6);
+        }
+
+        .opt-2 input[type="checkbox"]:checked+label {
+            background: linear-gradient(135deg, #0ea5e9 0%, #075985 100%);
+            color: white;
+            border-color: #0c4a6e;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.5);
+        }
+
+        .opt-2 input[type="checkbox"]:checked+label:hover {
+            background: linear-gradient(135deg, #0284c7 0%, #0a3d62 100%);
+            box-shadow: 0 6px 16px rgba(2, 132, 199, 0.6);
+        }
+
+        .opt-3 input[type="checkbox"]:checked+label {
+            background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+            color: white;
+            border-color: #831843;
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.5);
+        }
+
+        .opt-3 input[type="checkbox"]:checked+label:hover {
+            background: linear-gradient(135deg, #db2777 0%, #9d1d54 100%);
+            box-shadow: 0 6px 16px rgba(219, 39, 119, 0.6);
+        }
+
+        .opt-4 input[type="checkbox"]:checked+label {
+            background: linear-gradient(135deg, #6366f1 0%, #312e81 100%);
+            color: white;
+            border-color: #3730a3;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.5);
+        }
+
+        .opt-4 input[type="checkbox"]:checked+label:hover {
+            background: linear-gradient(135deg, #4f46e5 0%, #272359 100%);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.6);
+        }
+
+        .opt-6 input[type="checkbox"]:checked+label {
+            background: linear-gradient(135deg, #d946ef 0%, #86198f 100%);
+            color: white;
+            border-color: #880e4f;
+            box-shadow: 0 4px 12px rgba(217, 70, 239, 0.5);
+        }
+
+        .opt-6 input[type="checkbox"]:checked+label:hover {
+            background: linear-gradient(135deg, #c026d3 0%, #702a5a 100%);
+            box-shadow: 0 6px 16px rgba(192, 38, 211, 0.6);
+        }
+
+        .opt-WD input[type="checkbox"]:checked+label {
+            background: linear-gradient(135deg, #f97316 0%, #a16207 100%);
+            color: white;
+            border-color: #92400e;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.5);
+        }
+
+        .opt-WD input[type="checkbox"]:checked+label:hover {
+            background: linear-gradient(135deg, #ea580c 0%, #7c2d12 100%);
+            box-shadow: 0 6px 16px rgba(234, 88, 12, 0.6);
+        }
+
+        .opt-NB input[type="checkbox"]:checked+label {
+            background: linear-gradient(135deg, #f97316 0%, #a16207 100%);
+            color: white;
+            border-color: #92400e;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.5);
+        }
+
+        .opt-NB input[type="checkbox"]:checked+label:hover {
+            background: linear-gradient(135deg, #ea580c 0%, #7c2d12 100%);
+            box-shadow: 0 6px 16px rgba(234, 88, 12, 0.6);
+        }
+
+        .ball-option input[type="radio"]:checked+label {
+            transform: scale(1.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-color: transparent;
+        }
+
+        /* Color-coded ball options */
+        .opt-0 label {
+            background-color: #f0fdf4;
+            border-color: #86efac;
+            color: #166534;
+            font-weight: 700;
+        }
+
+        .opt-0 label:hover {
+            background-color: #dcfce7;
+            border-color: #4ade80;
+        }
+
+        .opt-1 label {
+            background-color: #fef3c7;
+            border-color: #fcd34d;
+            color: #92400e;
+            font-weight: 700;
+        }
+
+        .opt-1 label:hover {
+            background-color: #fde68a;
+            border-color: #fbbf24;
+        }
+
+        .opt-2 label {
+            background-color: #dbeafe;
+            border-color: #7dd3fc;
+            color: #0c4a6e;
+            font-weight: 700;
+        }
+
+        .opt-2 label:hover {
+            background-color: #bfdbfe;
+            border-color: #38bdf8;
+        }
+
+        .opt-3 label {
+            background-color: #fce7f3;
+            border-color: #f472b6;
+            color: #831843;
+            font-weight: 700;
+        }
+
+        .opt-3 label:hover {
+            background-color: #fbcfe8;
+            border-color: #ec4899;
+        }
+
+        .opt-4 label {
+            background-color: #e0e7ff;
+            border-color: #a5b4fc;
+            color: #3730a3;
+            font-weight: 700;
+        }
+
+        .opt-4 label:hover {
+            background-color: #c7d2fe;
+            border-color: #818cf8;
+        }
+
+        .opt-6 label {
+            background-color: #fce4ec;
+            border-color: #f06292;
+            color: #880e4f;
+            font-weight: 700;
+        }
+
+        .opt-6 label:hover {
+            background-color: #f8bbd0;
+            border-color: #ec407a;
+        }
+
+        .opt-W label {
+            background-color: #fee2e2;
+            border-color: #fca5a5;
+            color: #7f1d1d;
+            font-weight: 800;
+        }
+
+        .opt-W label:hover {
+            background-color: #fecaca;
+            border-color: #f87171;
+        }
+
+        .opt-W input[type="checkbox"]:checked+label {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            border-color: #7f1d1d;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5);
+            transform: scale(1.1);
+        }
+
+        .opt-W input[type="checkbox"]:checked+label:hover {
+            background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
+            box-shadow: 0 6px 16px rgba(185, 28, 28, 0.6);
+        }
+
+        .opt-WD label {
+            background-color: #fed7aa;
+            border-color: #fdba74;
+            color: #92400e;
+            font-weight: 700;
+        }
+
+        .opt-WD label:hover {
+            background-color: #fecaca;
+            border-color: #fb923c;
+        }
+
+        .opt-NB label {
+            background-color: #fed7aa;
+            border-color: #fdba74;
+            color: #92400e;
+            font-weight: 700;
+        }
+
+        .opt-NB label:hover {
+            background-color: #fecaca;
+            border-color: #fb923c;
+        }
+
+        /* Disabled state for run options when match won or all wickets lost */
+        .ball-option input[type="checkbox"]:disabled+label {
+            background-color: #d1d5db;
+            border-color: #9ca3af;
+            color: #6b7280;
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .ball-option input[type="checkbox"]:disabled+label:hover {
+            background-color: #d1d5db;
+            border-color: #9ca3af;
+            transform: none;
+        }
+
+        .sticky-score-header {
+            position: sticky;
+            top: 60px;
+            z-index: 30;
+        }
+
+        /* Creative BB Logo Icon */
+        .bb-icon-wrapper {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%);
+            border-radius: 25%;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .bb-icon-svg {
+            width: 80%;
+            height: 80%;
+            fill: white;
+        }
+
+        /* Tiled Watermark Background Decor */
+        .background-decor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+            opacity: 0.04;
+        }
+
+        .watermark-item {
+            position: absolute;
+            color: #1e3a8a;
+            transform: rotate(-15deg);
+        }
+
+        /* Persistent Branding Footer Watermark */
+        .bb-persistent-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 0;
+            background: linear-gradient(to top, rgba(243, 244, 246, 1) 70%, rgba(243, 244, 246, 0) 100%);
+            z-index: 40;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .bb-watermark-content {
+            opacity: 0.35;
+            transition: all 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            filter: grayscale(1);
+        }
+
+        body:hover .bb-watermark-content {
+            opacity: 0.9;
+            filter: grayscale(0);
+        }
+
+        .bb-tagline {
+            font-size: 7px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-top: 4px;
+            color: #1e3a8a;
+        }
+
+        /* Drag and Drop */
+        .draggable-item {
+            cursor: grab;
+            transition: all 0.2s;
+        }
+
+        .draggable-item.dragging {
+            opacity: 0.5;
+            border: 2px dashed #3b82f6;
+            transform: scale(0.98);
+        }
+
+        .mini-bracket-box {
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 4px;
+            font-size: 8px;
+            width: 60px;
+            text-align: center;
+            background: white;
+        }
+    </style>
+</head>
+
+<body class="text-gray-800 pb-44">
+
+    <!-- Decorative Background Watermarks -->
+    <div class="background-decor">
+        <div class="watermark-item" style="top: -5%; left: -5%; font-size: 25rem;"><i
+                class="fa-solid fa-cricket-bat-ball"></i></div>
+        <div class="watermark-item" style="top: 40%; right: -10%; font-size: 20rem; transform: rotate(20deg);"><i
+                class="fa-solid fa-medal"></i></div>
+        <div class="watermark-item" style="bottom: -5%; left: 10%; font-size: 18rem; transform: rotate(-45deg);"><i
+                class="fa-solid fa-trophy"></i></div>
+        <div class="watermark-item" style="bottom: 20%; right: 15%; font-size: 22rem; transform: rotate(10deg);">
+            <svg viewBox="0 0 100 100" style="fill: currentColor; width: 1em;">
+                <rect x="20" y="15" width="8" height="70" rx="2" />
+                <path d="M28 15 C 50 15, 50 45, 28 45 M28 45 C 55 45, 55 85, 28 85" fill="none" stroke="currentColor"
+                    stroke-width="8" />
+                <rect x="55" y="15" width="8" height="70" rx="2" />
+                <path d="M63 15 C 85 15, 85 45, 63 45 M63 45 C 90 45, 90 85, 63 85" fill="none" stroke="currentColor"
+                    stroke-width="8" />
+            </svg>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="bg-blue-900 text-white p-4 shadow-lg sticky top-0 z-50 h-[60px] flex items-center">
+        <div class="max-w-4xl mx-auto flex justify-between items-center w-full">
+            <div class="flex items-center gap-3">
+                <button id="back-btn" onclick="app.goBack()" class="hidden text-white hover:text-blue-200 p-1">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </button>
+                <div class="flex items-center gap-2" onclick="app.goHome()" style="cursor:pointer">
+                    <div class="bb-icon-wrapper w-8 h-8">
+                        <svg class="bb-icon-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="20" y="15" width="8" height="70" rx="2" />
+                            <path d="M28 15 C 50 15, 50 45, 28 45 M28 45 C 55 45, 55 85, 28 85" fill="none"
+                                stroke="white" stroke-width="8" stroke-linecap="round" />
+                            <rect x="55" y="15" width="8" height="70" rx="2" />
+                            <path d="M63 15 C 85 15, 85 45, 63 45 M63 45 C 90 45, 90 85, 63 85" fill="none"
+                                stroke="white" stroke-width="8" stroke-linecap="round" />
+                            <circle cx="78" cy="65" r="8" fill="#fbbf24" />
+                        </svg>
+                    </div>
+                    <h1 class="text-xl font-black tracking-tighter hidden sm:block uppercase">WicketUp</h1>
+                </div>
+            </div>
+            <button onclick="app.goHome()"
+                class="text-sm bg-blue-800 hover:bg-blue-700 px-3 py-1.5 rounded-lg transition-colors border border-blue-700">
+                <i class="fa-solid fa-house"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main id="app" class="max-w-4xl mx-auto p-4 min-h-screen relative"></main>
+
+    <!-- Persistent Branding Footer -->
+    <footer class="bb-persistent-footer">
+        <div class="bb-watermark-content">
+            <div class="flex items-center gap-2">
+                <div class="bb-icon-wrapper w-5 h-5 shadow-none">
+                    <svg class="bb-icon-svg" viewBox="0 0 100 100">
+                        <rect x="20" y="15" width="8" height="70" rx="2" />
+                        <path d="M28 15 C 50 15, 50 45, 28 45 M28 45 C 55 45, 55 85, 28 85" fill="none" stroke="white"
+                            stroke-width="8" />
+                        <rect x="55" y="15" width="8" height="70" rx="2" />
+                        <path d="M63 15 C 85 15, 85 45, 63 45 M63 45 C 90 45, 90 85, 63 85" fill="none" stroke="white"
+                            stroke-width="8" />
+                        <circle cx="78" cy="65" r="8" fill="#fbbf24" />
+                    </svg>
+                </div>
+                <span class="text-[10px] font-black tracking-[0.25em] uppercase italic text-slate-800">Barik
+                    Brothers</span>
+            </div>
+            <div class="bb-tagline">Precision Scoring Engine</div>
+        </div>
+    </footer>
+
+    <!-- Modal for New Tournament -->
+    <div id="modal-overlay"
+        class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div
+            class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all flex flex-col max-h-[90vh]">
+            <div class="bg-blue-900 p-4 text-white flex justify-between items-center shrink-0">
+                <h3 class="font-bold text-lg">New Tournament</h3>
+                <button onclick="ui.closeModal()"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="p-6 space-y-4 overflow-y-auto hide-scrollbar">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600 mb-1">Tournament Name</label>
+                    <input type="text" id="new-tourney-name"
+                        class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g. Smash Cup 2024">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600 mb-1">Overs Per Innings</label>
+                    <input type="number" id="new-tourney-overs" class="w-full border border-gray-300 rounded-lg p-2"
+                        value="20">
+                </div>
+                <div>
+                    <label
+                        class="block text-sm font-semibold text-gray-600 mb-1 text-blue-900 uppercase tracking-tighter">Final
+                        Playoff Style</label>
+                    <div class="grid grid-cols-2 gap-3 mt-1">
+                        <label class="cursor-pointer group">
+                            <input type="radio" name="new-tourney-format" value="IPL" class="hidden peer" checked>
+                            <div
+                                class="p-3 border-2 rounded-xl text-center peer-checked:border-blue-600 peer-checked:bg-blue-50 transition-all">
+                                <div class="text-xs font-bold uppercase">Eliminator</div>
+                                <div class="text-[9px] text-gray-500">Q1, Elim, Q2, Final</div>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer group">
+                            <input type="radio" name="new-tourney-format" value="Standard" class="hidden peer">
+                            <div
+                                class="p-3 border-2 rounded-xl text-center peer-checked:border-blue-600 peer-checked:bg-blue-50 transition-all">
+                                <div class="text-xs font-bold uppercase">Standard</div>
+                                <div class="text-[9px] text-gray-500">SF1, SF2, Final</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600 mb-1">Teams</label>
+                    <div class="flex gap-2 mb-2">
+                        <input type="text" id="team-input" class="flex-1 border border-gray-300 rounded-lg p-2"
+                            placeholder="Add Team Name" onkeypress="if(event.key === 'Enter') ui.addTeamToList()">
+                        <button onclick="ui.addTeamToList()"
+                            class="bg-green-600 text-white px-4 rounded-lg hover:bg-green-700 transition-colors"><i
+                                class="fa-solid fa-plus"></i></button>
+                    </div>
+                    <div id="team-list-display" class="flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+            <div class="p-6 border-t shrink-0">
+                <button onclick="app.createTournament()"
+                    class="w-full bg-blue-900 text-white font-bold py-3 rounded-lg shadow hover:bg-blue-800 transition-all">Create
+                    Tournament</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Modal UI -->
+    <div id="alert-modal"
+        class="fixed inset-0 bg-black/60 hidden z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all scale-100">
+            <div class="p-6 text-center">
+                <div id="alert-icon"
+                    class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                    <i class="fa-solid fa-info-circle"></i>
+                </div>
+                <h3 id="alert-title" class="text-xl font-bold text-gray-800 mb-2">Notice</h3>
+                <p id="alert-message" class="text-gray-500 mb-6 text-sm"></p>
+                <button onclick="ui.closeAlert()"
+                    class="w-full px-4 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 shadow-lg transition-all">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-confirm-modal"
+        class="fixed inset-0 bg-black bg-opacity-60 hidden z-[60] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden p-6 text-center">
+            <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4"><i
+                    class="fa-solid fa-trash-can text-2xl"></i></div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Delete Tournament?</h3>
+            <div class="flex gap-3 mt-6">
+                <button onclick="ui.closeDeleteModal()"
+                    class="flex-1 px-4 py-3 bg-gray-100 text-gray-700 font-bold rounded-lg hover:bg-gray-200 transition-all">Cancel</button>
+                <button onclick="app.executeDelete()"
+                    class="flex-1 px-4 py-3 bg-red-600 text-white font-bold rounded-lg shadow-lg hover:bg-red-700 transition-all">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unsaved Changes Confirmation Modal -->
+    <div id="unsaved-changes-modal"
+        class="fixed inset-0 bg-black bg-opacity-60 hidden z-[60] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden p-6 text-center">
+            <div
+                class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-warning text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Unsaved Selections</h3>
+            <p class="text-sm text-gray-600 mb-4">The current over has selections that will be <span
+                    class="font-bold text-red-600">RESET</span>. Are you sure you want to go back?</p>
+            <div class="text-xs text-gray-500 bg-amber-50 p-3 rounded-lg mb-4">
+                <strong>⚠️ Warning:</strong> All ball selections, runs, and wickets for this over will be lost.
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button onclick="ui.closeUnsavedModal()"
+                    class="flex-1 px-4 py-3 bg-gray-100 text-gray-700 font-bold rounded-lg hover:bg-gray-200 transition-all">Keep
+                    Scoring</button>
+                <button onclick="app.confirmGoBack()"
+                    class="flex-1 px-4 py-3 bg-red-600 text-white font-bold rounded-lg shadow-lg hover:bg-red-700 transition-all">Discard
+                    & Go Back</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA ENGINE ---
+        const Store = {
+            get: () => JSON.parse(localStorage.getItem('cricket_scorer_v3') || '[]'),
+            save: (data) => localStorage.setItem('cricket_scorer_v3', JSON.stringify(data)),
+            addTournament: (t) => { const data = Store.get(); data.push(t); Store.save(data); },
+            deleteTournament: (id) => { const data = Store.get().filter(t => t.id !== id); Store.save(data); app.goHome(); },
+            updateTournament: (updated) => { const data = Store.get(); const idx = data.findIndex(t => t.id === updated.id); if (idx !== -1) { data[idx] = updated; Store.save(data); } }
+        };
+
+        // --- CALCULATION LOGIC ---
+        const Logic = {
+            oversToBalls: (overs) => {
+                if (!overs) return 0;
+                const o = parseFloat(overs), w = Math.floor(o);
+                return (w * 6) + Math.round((o - w) * 10);
+            },
+            isRankConfirmed: (standings, rankIndex, tourney) => {
+                const team = standings[rankIndex]; if (!team) return false;
+                const rem = tourney.matches.filter(m => m.type === 'League' && !m.completed);
+                let maxPossibleBelow = -1;
+                for (let i = rankIndex + 1; i < standings.length; i++) {
+                    const t = standings[i], games = rem.filter(m => m.t1 === t.name || m.t2 === t.name).length;
+                    const max = t.pts + (games * 2); if (max > maxPossibleBelow) maxPossibleBelow = max;
+                }
+                return team.pts > maxPossibleBelow;
+            },
+            isEliminated: (standings, teamIndex, tourney) => {
+                const team = standings[teamIndex]; if (!team || standings.length <= 4) return false;
+                if (teamIndex < 4) return false;
+                const fourth = standings[3]; if (!fourth) return false;
+                const rem = tourney.matches.filter(m => m.type === 'League' && !m.completed);
+                const games = rem.filter(m => m.t1 === team.name || m.t2 === team.name).length;
+                return (team.pts + (games * 2)) < fourth.pts;
+            },
+            calculateStandings: (tourney) => {
+                let stats = {}; tourney.teams.forEach(t => { stats[t] = { name: t, p: 0, w: 0, l: 0, d: 0, pts: 0, runsFor: 0, ballsFor: 0, runsAgainst: 0, ballsAgainst: 0 }; });
+                tourney.matches.forEach(m => {
+                    if (!m.completed || m.type !== 'League') return;
+                    const t1 = stats[m.t1], t2 = stats[m.t2]; if (!t1 || !t2) return;
+                    t1.p++; t2.p++;
+                    const r1 = parseInt(m.t1s || 0), w1 = parseInt(m.t1w || 0), o1 = parseFloat(m.t1o || 0), r2 = parseInt(m.t2s || 0), w2 = parseInt(m.t2w || 0), o2 = parseFloat(m.t2o || 0);
+                    let b1 = Logic.oversToBalls(o1); if (w1 >= 10) b1 = Logic.oversToBalls(tourney.maxOvers);
+                    let b2 = Logic.oversToBalls(o2); if (w2 >= 10) b2 = Logic.oversToBalls(tourney.maxOvers);
+                    t1.runsFor += r1; t1.ballsFor += b1; t1.runsAgainst += r2; t1.ballsAgainst += b2;
+                    t2.runsFor += r2; t2.ballsFor += b2; t2.runsAgainst += r1; t2.ballsAgainst += b1;
+                    if (r1 > r2) { t1.w++; t1.pts += 2; t2.l++; } else if (r2 > r1) { t2.w++; t2.pts += 2; t1.l++; } else { t1.d++; t1.pts += 1; t2.d++; t2.pts += 1; }
+                });
+                let ranking = Object.values(stats).map(t => { const oF = t.ballsFor / 6, oA = t.ballsAgainst / 6; t.nrr = (oF === 0 ? 0 : t.runsFor / oF) - (oA === 0 ? 0 : t.runsAgainst / oA); return t; });
+                ranking.sort((a, b) => (b.pts - a.pts) || (b.nrr - a.nrr)); return ranking;
+            }
+        };
+
+        // --- APP ENGINE ---
+        const app = {
+            currentTournamentId: null, tempTeams: [], selectedMatchId: null, activeView: 'dashboard', deletePendingId: null,
+            scoringState: { currentBalls: [null, null, null, null, null, null], currentWickets: 0, currentRuns: 0, currentWides: 0, currentNoballs: 0 },
+
+            init: () => app.goHome(),
+            goHome: () => { app.currentTournamentId = null; app.tempTeams = []; app.activeView = 'dashboard'; ui.renderHome(); },
+            goBack: () => {
+                if (app.activeView === 'dashboard') {
+                    app.goHome();
+                } else if (app.activeView === 'calculator') {
+                    // CHECK: Are there unsaved selections in current over?
+                    const hasUnsavedSelections = app.scoringState.currentBalls.some(ball =>
+                        Array.isArray(ball) && ball.length > 0
+                    );
+
+                    if (hasUnsavedSelections) {
+                        // WARN: Show confirmation modal
+                        ui.openUnsavedModal();
+                    } else {
+                        // Safe to go back - no unsaved data
+                        app.confirmGoBack();
+                    }
+                } else {
+                    app.activeView = 'dashboard';
+                    ui.renderTournamentView();
+                }
+            },
+            confirmGoBack: () => {
+                // CONFIRMED: Reset current over and go back
+                ui.closeUnsavedModal();
+                app.scoringState.currentBalls = [null, null, null, null, null, null];
+                app.scoringState.currentWickets = 0;
+                app.scoringState.currentRuns = 0;
+                app.scoringState.currentWides = 0;
+                app.scoringState.currentNoballs = 0;
+                app.activeView = 'dashboard';
+                ui.renderTournamentView();
+            },
+            promptDelete: (id) => { app.deletePendingId = id; ui.openDeleteModal(); },
+            executeDelete: () => { if (app.deletePendingId) { Store.deleteTournament(app.deletePendingId); app.deletePendingId = null; ui.closeDeleteModal(); } },
+            openCreateModal: () => { app.tempTeams = []; document.getElementById('new-tourney-name').value = ''; ui.openModal(); },
+
+            createTournament: () => {
+                const name = document.getElementById('new-tourney-name').value.trim();
+                const overs = parseFloat(document.getElementById('new-tourney-overs').value);
+                const format = document.querySelector('input[name="new-tourney-format"]:checked').value;
+                if (!name || app.tempTeams.length < 2) return ui.showAlert("Setup Error", "Missing tournament name or teams.");
+                const newTourney = { id: Date.now().toString(), name, maxOvers: overs, teams: app.tempTeams, matches: app.generateSchedule(app.tempTeams), playoffStyle: format };
+                app.initKnockouts(newTourney, format); Store.addTournament(newTourney); app.openTournament(newTourney.id); ui.closeModal();
+            },
+
+            initKnockouts: (t, s) => {
+                let id = 1000;
+                if (s === 'IPL') {
+                    t.matches.push({ id: id++, label: "Qualifier 1", type: "Qualifier", t1: "1st Place", t2: "2nd Place", t1s: '', t1w: '', t1o: '', t2s: '', t2w: '', t2o: '', completed: false },
+                        { id: id++, label: "Eliminator", type: "Qualifier", t1: "3rd Place", t2: "4th Place", t1s: '', t1w: '', t1o: '', t2s: '', t2w: '', t2o: '', completed: false },
+                        { id: id++, label: "Qualifier 2", type: "Qualifier", t1: "Loser Q1", t2: "Winner Elim", t1s: '', t1w: '', t1o: '', t2s: '', t2w: '', t2o: '', completed: false },
+                        { id: id++, label: "Final", type: "Final", t1: "Winner Q1", t2: "Winner Q2", t1s: '', t1w: '', t1o: '', t2s: '', t2w: '', t2o: '', completed: false });
+                } else {
+                    t.matches.push({ id: id++, label: "Semi Final 1", type: "Semi Final", t1: "1st Place", t2: "4th Place", t1s: '', t1w: '', t1o: '', t2s: '', t2w: '', t2o: '', completed: false },
+                        { id: id++, label: "Semi Final 2", type: "Semi Final", t1: "2nd Place", t2: "3rd Place", t1s: '', t1w: '', t1o: '', t2s: '', t2w: '', t2o: '', completed: false },
+                        { id: id++, label: "Final", type: "Final", t1: "Winner SF1", t2: "Winner SF2", t1s: '', t1w: '', t1o: '', t2s: '', t2w: '', t2o: '', completed: false });
+                }
+            },
+
+            generateSchedule: (teams) => {
+                let matches = [], id = 1;
+                for (let i = 0; i < teams.length; i++) {
+                    for (let j = 0; j < teams.length; j++) {
+                        if (i !== j) {
+                            matches.push({ id: id++, label: `Match ${id - 1}`, type: 'League', t1: teams[i], t2: teams[j], t1s: '', t1w: '', t1o: '', t2s: '', t2w: '', t2o: '', completed: false });
+                        }
+                    }
+                }
+                return matches;
+            },
+
+            generateKnockouts: (style) => {
+                const tourney = Store.get().find(t => t.id === app.currentTournamentId);
+                if (!tourney) return;
+                tourney.matches = tourney.matches.filter(m => m.type === 'League');
+                app.initKnockouts(tourney, style);
+                tourney.playoffStyle = style;
+                Store.updateTournament(tourney);
+                ui.renderTournamentView();
+            },
+
+            openTournament: (id, view = 'dashboard') => { app.currentTournamentId = id; app.selectedMatchId = null; app.activeView = view; ui.renderTournamentView(); },
+
+            selectMatch: (id) => {
+                const tourney = Store.get().find(x => x.id === app.currentTournamentId);
+                if (!tourney) return;
+                const match = tourney.matches.find(x => x.id === parseInt(id));
+                if (!match) return;
+
+                // Check if another match is already in progress
+                const activeMatch = tourney.matches.find(m => m.inningsStatus && m.inningsStatus !== 'Completed' && m.id !== parseInt(id));
+                if (activeMatch) {
+                    return ui.showAlert("Match In Progress", `${activeMatch.label} is still in progress. Please complete it first!`);
+                }
+
+                const posKeywords = ["Place", "Winner", "Loser", "Match"];
+                if (match.type !== 'League' && posKeywords.some(p => match.t1.includes(p) || match.t2.includes(p))) {
+                    return ui.showAlert("Alert", "Teams positions yet to be finalised!");
+                }
+
+                // Reset scoring state when selecting a new match
+                app.scoringState.currentBalls = [null, null, null, null, null, null];
+                app.scoringState.currentWickets = 0;
+                app.scoringState.currentRuns = 0;
+                app.scoringState.currentWides = 0;
+                app.scoringState.currentNoballs = 0;
+
+                app.selectedMatchId = parseInt(id); app.activeView = 'calculator'; ui.renderTournamentView();
+            },
+
+            startMatchSetup: () => {
+                const tourney = Store.get().find(x => x.id === app.currentTournamentId);
+                const match = tourney.matches.find(x => x.id === app.selectedMatchId);
+                if (!match) return;
+                match.maxOvers = parseFloat(document.getElementById('setup-overs').value);
+                match.maxWickets = parseInt(document.getElementById('setup-wickets').value);
+                match.battingFirst = document.querySelector('input[name="setup-batting"]:checked').value;
+                match.inningsStatus = '1st'; match.t1s = '0'; match.t1w = '0'; match.t1o = '0.0'; match.t2s = '0'; match.t2w = '0'; match.t2o = '0.0';
+                Store.updateTournament(tourney); ui.renderCalculator(tourney);
+            },
+
+            startSecondInnings: () => {
+                const tourney = Store.get().find(t => t.id === app.currentTournamentId);
+                const match = tourney.matches.find(x => x.id === app.selectedMatchId);
+                if (!match) return;
+                match.inningsStatus = '2nd'; Store.updateTournament(tourney); ui.renderCalculator(tourney);
+            },
+
+            finishOver: () => {
+                const tourney = Store.get().find(t => t.id === app.currentTournamentId);
+                if (!tourney) return;
+                const match = tourney.matches.find(x => x.id === app.selectedMatchId);
+                if (!match) return;
+
+                let teamKey = (match.inningsStatus === '1st') ? (match.battingFirst === 't1' ? 't1' : 't2') : (match.battingFirst === 't1' ? 't2' : 't1');
+
+                // CHECK: Is current over complete with all 6 legal balls?
+                const legalBallsCompleted = app.calculateLegalBalls();
+                const maxWickets = match.maxWickets || 10;
+                const totalWickets = parseInt(match[teamKey + 'w'] || 0) + app.scoringState.currentWickets;
+
+                // CRICKET RULES: Check if innings should end early
+                // 1. All wickets lost (all out)
+                // 2. Target reached in 2nd innings
+                const isAllOut = totalWickets >= maxWickets;
+                const targetReached = match.inningsStatus === '2nd' ? (() => {
+                    const firstInnTeam = match.battingFirst === 't1' ? 't1' : 't2';
+                    const targetRuns = parseInt(match[firstInnTeam + 's']) + 1;
+                    const currentRuns = parseInt(match[teamKey + 's'] || 0) + app.scoringState.currentRuns;
+                    return currentRuns >= targetRuns;
+                })() : false;
+
+                // ALLOW: Proceed if over is complete OR innings ends early
+                if (legalBallsCompleted < 6 && !isAllOut && !targetReached) {
+                    // NOT COMPLETE AND NO EARLY END: Show warning
+                    const ballsRemaining = 6 - legalBallsCompleted;
+                    ui.showAlert(
+                        "Incomplete Over",
+                        `Please complete all legal deliveries. ${ballsRemaining} ball(s) remaining.`
+                    );
+                    return;
+                }
+
+                // VALIDATION: Ensure all delivery data is valid before saving
+                // Clean up any invalid WD+NB combinations in current balls
+                app.scoringState.currentBalls.forEach((ballArray, idx) => {
+                    if (Array.isArray(ballArray)) {
+                        app.sanitizeDeliveryData(ballArray);
+                    }
+                });
+
+                match[teamKey + 's'] = (parseInt(match[teamKey + 's'] || 0) + app.scoringState.currentRuns).toString();
+                match[teamKey + 'w'] = (parseInt(match[teamKey + 'w'] || 0) + app.scoringState.currentWickets).toString();
+
+                // CRICKET RULES IMPLEMENTATION:
+                // According to official cricket rules:
+                // - Only LEGAL deliveries count toward ball count and overs
+                // - Wides (WD) and No-Balls (NB) are EXTRAS and do NOT increment the ball count
+                // - An over = 6 legal deliveries exactly
+                // - Free hits after no-balls still count as legal unless they are wide/no-ball themselves
+                // - A delivery CANNOT be both WD and NB simultaneously
+                // - Innings ends early if all wickets lost or target reached
+
+                const legalBallsThisOver = app.calculateLegalBalls();  // Only counts legal deliveries
+                const currentOvers = parseFloat(match[teamKey + 'o'] || 0);
+                const currentOversComplete = Math.floor(currentOvers);
+                const currentBallsInOvers = Math.round((currentOvers - currentOversComplete) * 10);
+
+                // Calculate total legal balls bowled so far
+                const totalLegalBalls = currentOversComplete * 6 + currentBallsInOvers + legalBallsThisOver;
+
+                // Convert back to overs format (overs.balls)
+                const completedOvers = Math.floor(totalLegalBalls / 6);
+                const remainingBalls = totalLegalBalls % 6;
+                match[teamKey + 'o'] = (completedOvers + (remainingBalls / 10)).toFixed(1);
+
+                const limitOvers = match.maxOvers || tourney.maxOvers, limitWkts = match.maxWickets || 10;
+                let endInnings = (parseInt(match[teamKey + 'w']) >= limitWkts || parseFloat(match[teamKey + 'o']) >= limitOvers);
+
+                if (match.inningsStatus === '2nd') {
+                    const firstInnKey = (match.battingFirst === 't1' ? 't1' : 't2');
+                    const target = parseInt(match[firstInnKey + 's']) + 1;
+                    if (parseInt(match[teamKey + 's']) >= target) {
+                        match.completed = true;
+                        match.resultMsg = `${match[teamKey]} won!`;
+                    } else if (endInnings) {
+                        match.completed = true;
+                        match.resultMsg = parseInt(match[teamKey + 's']) === target - 1 ? "Match Tied!" : `${match[firstInnKey]} won!`;
+                    }
+                } else if (endInnings) {
+                    match.inningsStatus = 'Innings Break';
+                }
+
+                if (match.completed) {
+                    match.inningsStatus = 'Completed';
+                    app.updatePlayoffFlow(tourney, match);
+                }
+                Store.updateTournament(tourney);
+                app.scoringState.currentBalls = [null, null, null, null, null, null];
+                app.scoringState.currentRuns = 0;
+                app.scoringState.currentWickets = 0;
+                app.scoringState.currentWides = 0;
+                app.scoringState.currentNoballs = 0;
+                ui.renderCalculator(tourney);
+            },
+
+            updatePlayoffFlow: (t, m) => {
+                const q1 = t.matches.find(x => x.label === "Qualifier 1"), elim = t.matches.find(x => x.label === "Eliminator"), q2 = t.matches.find(x => x.label === "Qualifier 2"), final = t.matches.find(x => x.label === "Final");
+                const sf1 = t.matches.find(x => x.label === "Semi Final 1"), sf2 = t.matches.find(x => x.label === "Semi Final 2");
+
+                if (t.playoffStyle === 'IPL') {
+                    if (q1 && q1.completed) { const w = parseInt(q1.t1s) > parseInt(q1.t2s) ? q1.t1 : q1.t2, l = parseInt(q1.t1s) > parseInt(q1.t2s) ? q1.t2 : q1.t1; if (final) final.t1 = w; if (q2) q2.t1 = l; }
+                    if (elim && elim.completed) { if (q2) q2.t2 = parseInt(elim.t1s) > parseInt(elim.t2s) ? elim.t1 : elim.t2; }
+                    if (q2 && q2.completed) { if (final) final.t2 = parseInt(q2.t1s) > parseInt(q2.t2s) ? q2.t1 : q2.t2; }
+                } else {
+                    if (sf1 && sf1.completed) final.t1 = parseInt(sf1.t1s) > parseInt(sf1.t2s) ? sf1.t1 : sf1.t2;
+                    if (sf2 && sf2.completed) final.t2 = parseInt(sf2.t1s) > parseInt(sf2.t2s) ? sf2.t1 : sf2.t2;
+                }
+            },
+
+            validateWideAndNoBallMutualExclusivity: (ballArray, newValue) => {
+                // CRICKET RULES: A delivery MUST be EXACTLY ONE of:
+                // 1. A legal delivery (0, 1, 2, 3, 4, 6, W)
+                // 2. A Wide (WD)
+                // 3. A No Ball (NB)
+                // But NEVER both Wide AND No Ball
+
+                if (newValue === 'WD') {
+                    // If adding WD, remove NB if present
+                    const nbIndex = ballArray.indexOf('NB');
+                    if (nbIndex > -1) {
+                        ballArray.splice(nbIndex, 1);
+                    }
+                } else if (newValue === 'NB') {
+                    // If adding NB, remove WD if present
+                    const wdIndex = ballArray.indexOf('WD');
+                    if (wdIndex > -1) {
+                        ballArray.splice(wdIndex, 1);
+                    }
+                }
+                return ballArray;
+            },
+
+            handleWideNoBallToggle: (ballArray, newValue, isChecked) => {
+                // IMPROVED UX: Smart mutual exclusivity without permanent disabling
+                // 
+                // Problem with old approach: Checkboxes became permanently disabled
+                // Solution: Allow users to switch between WD/NB by auto-deselecting the other
+                //
+                // Logic:
+                // - User selects WD → Check if NB is there → Auto-remove NB → Add WD
+                // - User then wants NB instead → Deselect WD → NB becomes available
+                // - User selects NB → Check if WD is there → Auto-remove WD → Add NB
+
+                if (!isChecked) {
+                    // User is deselecting, just remove it (this re-enables the other option)
+                    const idx = ballArray.indexOf(newValue);
+                    if (idx > -1) {
+                        ballArray.splice(idx, 1);
+                    }
+                    return;
+                }
+
+                // User is trying to SELECT WD or NB
+                // First, intelligently remove the conflicting option if present
+                if (newValue === 'WD' && ballArray.includes('NB')) {
+                    // User wants WD, but NB is already selected
+                    // Auto-remove NB to make room for WD (smart swap)
+                    const nbIdx = ballArray.indexOf('NB');
+                    ballArray.splice(nbIdx, 1);
+                } else if (newValue === 'NB' && ballArray.includes('WD')) {
+                    // User wants NB, but WD is already selected
+                    // Auto-remove WD to make room for NB (smart swap)
+                    const wdIdx = ballArray.indexOf('WD');
+                    ballArray.splice(wdIdx, 1);
+                }
+
+                // Now add the new value if not already present
+                if (!ballArray.includes(newValue)) {
+                    ballArray.push(newValue);
+                }
+            },
+
+            updateGridScore: (i, v, isChecked) => {
+                const value = v === 'W' ? 'W' : (v === 'WD' ? 'WD' : (v === 'NB' ? 'NB' : parseInt(v)));
+
+                // Initialize as array if not already
+                if (!Array.isArray(app.scoringState.currentBalls[i])) {
+                    app.scoringState.currentBalls[i] = [];
+                }
+
+                const ballArray = app.scoringState.currentBalls[i];
+                let needsGridRender = false;
+
+                // CRICKET RULES: Wide (WD) and No-Ball (NB) are extras that:
+                // 1. Don't count as legal deliveries
+                // 2. EACH WD/NB requires ONE compensation ball (extra delivery in same over)
+                // 3. Cannot both exist on same delivery (mutual exclusivity)
+                // Example: 2 WDs = 2 compensation balls (8 total balls in array)
+
+                if (value === 'WD' || value === 'NB') {
+                    // Use smart toggle logic to handle WD/NB mutual exclusivity
+                    app.handleWideNoBallToggle(ballArray, value, isChecked);
+
+                    // COUNT: How many WD/NB exist in this over (including this one after toggle)?
+                    const totalWDNBCount = app.scoringState.currentBalls.slice(0, i + 1).reduce((count, b) => {
+                        if (Array.isArray(b) && (b.includes('WD') || b.includes('NB'))) {
+                            return count + 1;
+                        }
+                        return count;
+                    }, 0);
+
+                    // EXPECTED: Should have (6 + totalWDNBCount) items in array
+                    // 6 = base legal deliveries, + 1 for each WD/NB
+                    const expectedLength = 6 + totalWDNBCount;
+                    const currentLength = app.scoringState.currentBalls.length;
+
+                    // INSERT: Add compensation balls if array is shorter than expected
+                    // This handles adding multiple compensation balls for multiple WD/NB
+                    if (isChecked && currentLength < expectedLength) {
+                        const ballsToAdd = expectedLength - currentLength;
+                        for (let j = 0; j < ballsToAdd; j++) {
+                            app.scoringState.currentBalls.splice(i + 1, 0, null);
+                        }
+                        needsGridRender = true;
+                    }
+
+                    // REMOVE: Remove compensation balls if array is longer than expected
+                    // This handles removing multiple compensation balls when WD/NB are deselected
+                    if (!isChecked && currentLength > expectedLength) {
+                        const ballsToRemove = currentLength - expectedLength;
+                        for (let j = 0; j < ballsToRemove; j++) {
+                            // Find and remove null compensation balls from the end
+                            if (i + 1 < app.scoringState.currentBalls.length) {
+                                app.scoringState.currentBalls.splice(i + 1, 1);
+                            }
+                        }
+                        needsGridRender = true;
+                    }
+                } else {
+                    // Regular delivery (runs or wicket)
+                    if (isChecked) {
+                        if (!ballArray.includes(value)) {
+                            ballArray.push(value);
+                        }
+                    } else {
+                        const idx = ballArray.indexOf(value);
+                        if (idx > -1) {
+                            ballArray.splice(idx, 1);
+                        }
+                    }
+                }
+
+                // Recalculate totals - ensure all calculations are done correctly
+                app.calculateScoringTotals();
+
+                // Always re-render the grid to update dots and score display for ANY selection
+                const tourney = Store.get().find(t => t.id === app.currentTournamentId);
+                const match = tourney.matches.find(x => x.id === app.selectedMatchId);
+                if (match) {
+                    ui.renderLiveScoringGrid(match);
+                }
+            },
+
+            sanitizeDeliveryData: (ballArray) => {
+                // SAFETY: Clean up legacy data that might have invalid WD+NB combination
+                // This handles edge cases where data was loaded from older saved matches
+                if (Array.isArray(ballArray)) {
+                    const hasWide = ballArray.includes('WD');
+                    const hasNoBall = ballArray.includes('NB');
+
+                    if (hasWide && hasNoBall) {
+                        // Invalid state: both WD and NB present
+                        // Keep WD (more common) and remove NB
+                        const nbIndex = ballArray.indexOf('NB');
+                        if (nbIndex > -1) {
+                            ballArray.splice(nbIndex, 1);
+                        }
+                        console.warn('Sanitized invalid delivery state: removed NB when WD was present');
+                    }
+                }
+                return ballArray;
+            },
+
+            calculateLegalBalls: () => {
+                // CRICKET RULES: Only legal deliveries count toward ball count and overs
+                // Wides (WD) and No Balls (NB) are EXTRAS and do NOT count as legal balls
+                // An over consists of exactly 6 legal balls only
+                let legalBallCount = 0;
+                app.scoringState.currentBalls.forEach(b => {
+                    if (Array.isArray(b) && b.length > 0) {
+                        // A legal delivery is one that is neither WD nor NB
+                        // Examples of legal balls: runs (0,1,2,3,4,6), Wickets (W)
+                        const hasLegalDelivery = b.some(val => val !== 'WD' && val !== 'NB');
+                        if (hasLegalDelivery) {
+                            legalBallCount++;
+                        }
+                    }
+                });
+                return legalBallCount;
+            },
+
+            calculateDeliveries: () => {
+                // Deprecated: Use calculateLegalBalls() instead
+                // Kept for backwards compatibility
+                return app.calculateLegalBalls();
+            },
+
+            calculateScoringTotals: () => {
+                let r = 0, w = 0, wides = 0, noballs = 0;
+
+                app.scoringState.currentBalls.forEach(b => {
+                    if (Array.isArray(b) && b.length > 0) {
+                        b.forEach(val => {
+                            if (val === 'W') {
+                                // Wicket: counts as a legal delivery, adds 0 runs
+                                w++;
+                            } else if (val === 'WD') {
+                                // Wide: NOT a legal delivery, but adds 1 run (penalty)
+                                // Does NOT increment ball count (see calculateLegalBalls)
+                                wides++;
+                                r += 1;
+                            } else if (val === 'NB') {
+                                // No Ball: NOT a legal delivery, but adds 1 run (penalty)
+                                // Does NOT increment ball count (see calculateLegalBalls)
+                                noballs++;
+                                r += 1;
+                            } else if (typeof val === 'number' && val !== null && val !== undefined) {
+                                // Runs: legal delivery, adds specified runs
+                                r += val;
+                            }
+                        });
+                    }
+                });
+
+                app.scoringState.currentRuns = r;
+                app.scoringState.currentWickets = w;
+                app.scoringState.currentWides = wides;
+                app.scoringState.currentNoballs = noballs;
+            },
+            reorderSchedule: (f, t) => {
+                const tourney = Store.get().find(x => x.id === app.currentTournamentId);
+                const leagueMatches = tourney.matches.filter(m => m.type === 'League');
+                const otherMatches = tourney.matches.filter(m => m.type !== 'League');
+                const [item] = leagueMatches.splice(f, 1);
+                leagueMatches.splice(t, 0, item);
+                tourney.matches = [...leagueMatches, ...otherMatches];
+                Store.updateTournament(tourney);
+                app.normalizeSchedule(tourney, null);
+            },
+            normalizeSchedule: (tourney, pId) => {
+                let c = 1;
+                tourney.matches.forEach(m => {
+                    if (m.type === 'League') {
+                        if (m.id !== pId && /^Match \d+$/.test(m.label)) m.label = `Match ${c}`;
+                        c++;
+                    }
+                });
+                Store.updateTournament(tourney);
+                ui.renderScheduleManager(tourney);
+            },
+            renameMatch: (id, n) => { const tourney = Store.get().find(t => t.id === app.currentTournamentId), m = tourney.matches.find(i => i.id === id); if (m) { m.label = n; Store.updateTournament(tourney); app.normalizeSchedule(tourney, id); } }
+        };
+
+        // --- UI ---
+        const ui = {
+            main: document.getElementById('app'),
+            openModal: () => document.getElementById('modal-overlay').classList.remove('hidden'),
+            closeModal: () => document.getElementById('modal-overlay').classList.add('hidden'),
+            openDeleteModal: () => document.getElementById('delete-confirm-modal').classList.remove('hidden'),
+            closeDeleteModal: () => document.getElementById('delete-confirm-modal').classList.add('hidden'),
+            openUnsavedModal: () => document.getElementById('unsaved-changes-modal').classList.remove('hidden'),
+            closeUnsavedModal: () => document.getElementById('unsaved-changes-modal').classList.add('hidden'),
+            showAlert: (t, m) => { document.getElementById('alert-title').innerText = t; document.getElementById('alert-message').innerText = m; document.getElementById('alert-modal').classList.remove('hidden'); },
+            closeAlert: () => document.getElementById('alert-modal').classList.add('hidden'),
+            addTeamToList: () => { const i = document.getElementById('team-input'), n = i.value.trim(); if (n && !app.tempTeams.includes(n)) { app.tempTeams.push(n); ui.renderTempTeams(); i.value = ''; i.focus(); } },
+            renderTempTeams: () => { const c = document.getElementById('team-list-display'); c.innerHTML = app.tempTeams.map((t, i) => `<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full flex items-center gap-1">${t} <button onclick="app.tempTeams.splice(${i},1); ui.renderTempTeams()" class="text-red-500 font-bold">&times;</button></span>`).join('') || '<p class="text-gray-400 text-sm italic w-full text-center">No teams added yet</p>'; },
+
+            renderHome: () => {
+                const tourneys = Store.get(); document.getElementById('back-btn').classList.add('hidden');
+                let html = `<div class="fade-in space-y-6"><div class="bg-blue-50 rounded-2xl p-8 border-2 border-blue-200 shadow-sm"><h2 class="text-2xl font-bold text-blue-900 mb-2">Tournament Scorer</h2><p class="text-blue-700 text-sm">Manage and score your cricket tournaments</p></div><div class="flex justify-between items-center"><h2 class="text-xl font-bold text-gray-800 uppercase tracking-tighter">Your Tournaments</h2><button onclick="app.openCreateModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow lg hover:bg-blue-700 transition-all flex items-center gap-2"><i class="fa-solid fa-plus text-xs"></i> New</button></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
+                tourneys.forEach(t => { const c = t.matches.filter(m => m.completed).length, pr = Math.round((c / t.matches.length) * 100); html += `<div class="bg-white rounded-xl p-5 border hover:shadow-md cursor-pointer relative transition-all" onclick="app.openTournament('${t.id}')"><button onclick="event.stopPropagation(); app.promptDelete('${t.id}')" class="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition-colors"><i class="fa-solid fa-trash text-sm"></i></button><h3 class="font-bold text-lg text-blue-900 leading-tight">${t.name}</h3><p class="text-xs text-gray-500 mb-3">${t.teams.length} Teams • ${t.maxOvers} Overs</p><div class="w-full bg-gray-100 h-1.5 rounded-full mb-1"><div class="bg-blue-500 h-full rounded-full transition-all duration-500" style="width: ${pr}%"></div></div><div class="flex justify-between text-[10px] text-gray-400"><span>${pr}% Done</span><span>${c}/${t.matches.length} Matches</span></div></div>`; });
+                ui.main.innerHTML = html + `</div></div>`;
+            },
+
+            renderTournamentView: () => {
+                const tourney = Store.get().find(t => t.id === app.currentTournamentId); if (!tourney) return app.goHome();
+                document.getElementById('back-btn').classList.remove('hidden');
+                const tabs = `<div class="flex space-x-1 bg-white p-1 rounded-xl border mb-6 shadow-sm overflow-x-auto"><button onclick="app.openTournament('${tourney.id}', 'dashboard')" class="flex-1 py-2 px-4 rounded-lg text-sm font-medium transition ${app.activeView === 'dashboard' ? 'bg-blue-100 text-blue-700 shadow-sm' : 'text-gray-500'}">Dashboard</button><button onclick="app.openTournament('${tourney.id}', 'schedule')" class="flex-1 py-2 px-4 rounded-lg text-sm font-medium transition ${app.activeView === 'schedule' ? 'bg-blue-100 text-blue-700 shadow-sm' : 'text-gray-500'}">Schedule</button><button onclick="app.openTournament('${tourney.id}', 'calculator')" class="flex-1 py-2 px-4 rounded-lg text-sm font-medium transition ${app.activeView === 'calculator' ? 'bg-blue-100 text-blue-700 shadow-sm' : 'text-gray-500'}">Scorer</button></div>`;
+                ui.main.innerHTML = `<div class="fade-in"><div class="mb-4 flex flex-col"><h2 class="text-2xl font-bold text-gray-900 tracking-tighter leading-none">${tourney.name}</h2><span class="bg-blue-100 text-blue-800 text-[10px] px-2 py-0.5 rounded font-mono w-fit mt-1">ID: ${tourney.id.substr(-6)}</span></div>${tabs}<div id="view-content"></div></div>`;
+                if (app.activeView === 'dashboard') ui.renderDashboardContent(tourney); else if (app.activeView === 'schedule') ui.renderScheduleManager(tourney); else if (app.activeView === 'calculator') ui.renderCalculator(tourney);
+            },
+
+            renderDashboardContent: (tourney) => {
+                const standings = Logic.calculateStandings(tourney);
+                const leagueMatches = tourney.matches.filter(m => m.type === 'League');
+                const allLeagueDone = leagueMatches.every(m => m.completed);
+                const hasPlayoffs = tourney.matches.some(m => m.type !== 'League');
+
+                if (hasPlayoffs) {
+                    const sf1 = tourney.matches.find(m => m.label === 'Qualifier 1' || m.label === 'Semi Final 1'), elim = tourney.matches.find(m => m.label === 'Eliminator' || m.label === 'Semi Final 2');
+                    if (allLeagueDone) {
+                        if (tourney.playoffStyle === 'IPL') { if (sf1 && !sf1.completed) { sf1.t1 = standings[0]?.name; sf1.t2 = standings[1]?.name; } if (elim && !elim.completed) { elim.t1 = standings[2]?.name; elim.t2 = standings[3]?.name; } }
+                        else { if (sf1 && !sf1.completed) { sf1.t1 = standings[0]?.name; sf1.t2 = standings[3]?.name; } if (elim && !elim.completed) { elim.t1 = standings[1]?.name; elim.t2 = standings[2]?.name; } }
+                    } else {
+                        if (tourney.playoffStyle === 'IPL') {
+                            if (sf1 && !sf1.completed) { sf1.t1 = Logic.isRankConfirmed(standings, 0, tourney) ? standings[0].name : "1st Place"; sf1.t2 = Logic.isRankConfirmed(standings, 1, tourney) ? standings[1].name : "2nd Place"; }
+                            if (elim && !elim.completed) { elim.t1 = Logic.isRankConfirmed(standings, 2, tourney) ? standings[2].name : "3rd Place"; elim.t2 = Logic.isRankConfirmed(standings, 3, tourney) ? standings[3].name : "4th Place"; }
+                        } else {
+                            if (sf1 && !sf1.completed) { sf1.t1 = Logic.isRankConfirmed(standings, 0, tourney) ? standings[0].name : "1st Place"; sf1.t2 = Logic.isRankConfirmed(standings, 3, tourney) ? standings[3].name : "4th Place"; }
+                            if (elim && !elim.completed) { elim.t1 = Logic.isRankConfirmed(standings, 1, tourney) ? standings[1].name : "2nd Place"; elim.t2 = Logic.isRankConfirmed(standings, 2, tourney) ? standings[2].name : "3rd Place"; }
+                        }
+                    }
+                }
+
+                const activeMatch = tourney.matches.find(m => ['1st', '2nd', 'Innings Break'].includes(m.inningsStatus));
+                let headerContent = ''; const championMatch = tourney.matches.find(m => m.type === "Final" && m.completed);
+                if (championMatch) {
+                    const winner = parseInt(championMatch.t1s) > parseInt(championMatch.t2s) ? championMatch.t1 : championMatch.t2;
+                    headerContent = `<div class="bg-gradient-to-br from-yellow-500 to-orange-600 text-white rounded-2xl p-8 shadow-xl mb-8 text-center relative overflow-hidden win-card-pop"><i class="fa-solid fa-trophy absolute -right-4 -bottom-4 text-9xl text-white/10"></i><h3 class="text-2xl font-black uppercase mb-2">Champion</h3><div class="text-4xl font-bold mb-2 leading-none">${winner}</div><p class="text-xs uppercase font-bold tracking-widest opacity-80">Official Winners • Barik Brothers</p></div>`;
+                } else if (activeMatch) {
+                    let teamKey = activeMatch.inningsStatus === '2nd' ? (activeMatch.battingFirst === 't1' ? 't2' : 't1') : (activeMatch.battingFirst === 't1' ? 't1' : 't2');
+                    let r = parseInt(activeMatch[teamKey + 's'] || 0), w = parseInt(activeMatch[teamKey + 'w'] || 0), o = parseFloat(activeMatch[teamKey + 'o'] || 0), bl = Logic.oversToBalls(o), crr = bl > 0 ? (r / bl * 6).toFixed(2) : "0.00";
+                    let ts = ''; if (activeMatch.inningsStatus === '2nd') { let fk = activeMatch.battingFirst === 't1' ? 't1' : 't2', t = parseInt(activeMatch[fk + 's']) + 1, n = t - r, br = (activeMatch.maxOvers * 6) - bl; ts = `<div class="mt-4 pt-3 border-t border-blue-400/30 flex justify-between text-sm"><div>Target: <span class="font-bold text-white text-lg">${t}</span></div><div>Need <span class="text-yellow-300 font-bold text-lg">${n}</span> runs in <span class="font-bold text-white text-lg">${br}</span> balls</div></div>`; }
+                    headerContent = `<div onclick="app.selectMatch(${activeMatch.id})" class="bg-gradient-to-br from-blue-900 to-indigo-900 text-white rounded-2xl p-6 shadow-xl mb-8 relative cursor-pointer transform hover:-translate-y-1 transition-all"><div class="flex justify-between items-start mb-4"><span class="bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-full animate-pulse uppercase tracking-widest">Live Match</span><span class="text-xs text-blue-200">${activeMatch.label}</span></div><div class="flex justify-between items-end"><div><h3 class="text-2xl font-bold text-white mb-2 leading-none">${activeMatch[teamKey === 't1' ? 't1' : 't2']}</h3><div class="flex items-baseline gap-3"><span class="text-5xl font-bold leading-none">${r}/${w}</span><span class="text-xl text-blue-200">(${o} ov)</span></div></div><div class="text-right">CRR<div class="text-2xl font-bold leading-none">${crr}</div></div></div>${ts}</div>`;
+                }
+
+                document.getElementById('view-content').innerHTML = `
+                    ${headerContent}
+                    <div class="space-y-6">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                            <div class="bg-gray-50 p-4 border-b font-bold flex justify-between items-center text-gray-700"><span>Points Table</span>${!hasPlayoffs ? `<button onclick="ui.showPlayoffFormatPicker()" class="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-lg font-bold shadow transition-colors uppercase tracking-tighter">Final Format</button>` : `<button onclick="ui.showPlayoffFormatPicker()" class="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg font-bold hover:bg-gray-200 transition-colors uppercase tracking-tighter">Change Format</button>`}</div>
+                            <div class="overflow-x-auto"><table class="w-full text-sm text-left"><thead class="text-xs uppercase bg-gray-50 text-gray-400"><tr><th class="px-4 py-3">Team</th><th class="px-2 py-3 text-center">P</th><th class="px-2 py-3 text-center text-green-700">W</th><th class="px-2 py-3 text-center text-red-500">L</th><th class="px-2 py-3 text-center text-orange-500">D</th><th class="px-2 py-3 text-center font-bold">Pts</th><th class="px-4 py-3 text-right">NRR</th></tr></thead><tbody>${standings.map((t, i) => {
+                    let badge = ''; if (Logic.isRankConfirmed(standings, i, tourney)) badge = i < 4 ? '<span class="ml-1 px-1 bg-green-100 text-green-600 text-[8px] font-black rounded border border-green-200">Q</span>' : ''; else if (Logic.isEliminated(standings, i, tourney)) badge = '<span class="ml-1 px-1 bg-red-100 text-red-600 text-[8px] font-black rounded border border-red-200">E</span>';
+                    return `<tr class="border-b ${i < 4 ? 'bg-blue-50/20' : 'bg-white'} hover:bg-gray-50 transition-colors"><td class="px-4 py-3 font-semibold text-gray-900 flex items-center"><span class="text-xs text-gray-300 mr-2">${i + 1}</span>${t.name}${badge}</td><td class="px-2 py-3 text-center">${t.p}</td><td class="px-2 py-3 text-center text-green-600">${t.w}</td><td class="px-2 py-3 text-center text-red-500">${t.l}</td><td class="px-2 py-3 text-center text-gray-400">${t.d}</td><td class="px-2 py-3 text-center font-bold text-blue-600">${t.pts}</td><td class="px-4 py-3 text-right font-mono text-xs ${t.nrr >= 0 ? 'text-green-600' : 'text-red-500'}">${t.nrr > 0 ? '+' : ''}${t.nrr.toFixed(3)}</td></tr>`;
+                }).join('')}</tbody></table></div>
+                        </div>
+                        ${hasPlayoffs ? ui.renderBracket(tourney) : ''}
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 mt-6"><div class="bg-gray-50 p-4 border-b font-bold text-gray-700 flex items-center gap-2"><i class="fa-solid fa-calendar-check text-blue-500"></i> Match Grid</div><div class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${ui.renderScheduleList(tourney)}</div></div>
+                    </div>
+                `;
+            },
+
+            showPlayoffFormatPicker: () => {
+                const picker = document.createElement('div'); picker.id = 'format-picker-modal'; picker.className = "fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-4 backdrop-blur-sm";
+                picker.innerHTML = `<div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden fade-in"><div class="p-6 bg-blue-900 text-white flex justify-between items-center"><h3 class="text-xl font-bold">Select Playoffs Style</h3><button onclick="this.parentElement.parentElement.parentElement.remove()" class="text-white/50 hover:text-white"><i class="fa-solid fa-times"></i></button></div><div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8"><div onclick="app.generateKnockouts('Standard'); document.getElementById('format-picker-modal').remove();" class="cursor-pointer border-2 border-gray-100 rounded-2xl p-6 hover:border-blue-500 hover:bg-blue-50/30 transition-all group text-center"><h4 class="text-lg font-bold text-gray-800 mb-2 uppercase tracking-tighter">Standard</h4><div class="flex flex-col gap-2 items-center opacity-70 mt-4"><div class="flex gap-4"><div class="mini-bracket-box bg-blue-50 border-blue-200">SF 1</div><div class="mini-bracket-box bg-red-50 border-red-200">SF 2</div></div><i class="fa-solid fa-chevron-down text-gray-300"></i><div class="mini-bracket-box font-bold border-yellow-500 bg-yellow-50 text-yellow-700 text-[10px]">FINAL</div></div></div><div onclick="app.generateKnockouts('IPL'); document.getElementById('format-picker-modal').remove();" class="cursor-pointer border-2 border-gray-100 rounded-2xl p-6 hover:border-indigo-500 hover:bg-indigo-50/30 transition-all group text-center"><h4 class="text-lg font-bold text-gray-800 mb-2 uppercase tracking-tighter">IPL Style</h4><div class="flex flex-col gap-2 items-center opacity-70 mt-4"><div class="flex gap-4"><div class="mini-bracket-box bg-blue-50 border-blue-200">Qual 1</div><div class="mini-bracket-box bg-red-50 border-red-200">Elim</div></div><i class="fa-solid fa-chevron-down text-gray-300"></i><div class="mini-bracket-box bg-orange-50 border-orange-200">Qual 2</div><i class="fa-solid fa-chevron-down text-gray-300"></i><div class="mini-bracket-box font-bold border-yellow-500 bg-yellow-50 text-yellow-700 text-[10px]">FINAL</div></div></div></div></div>`;
+                document.body.appendChild(picker);
+            },
+
+            renderBracket: (tourney) => {
+                const matches = tourney.matches.filter(m => m.type !== 'League');
+                const sf1 = matches.find(m => m.label.includes("Qualifier 1") || m.label.includes("Semi Final 1")), elim = matches.find(m => m.label === "Eliminator"), sf2 = matches.find(m => m.label === "Semi Final 2"), q2 = matches.find(m => m.label === "Qualifier 2"), final = matches.find(m => m.label === "Final");
+
+                const renderBox = (m) => {
+                    if (!m) return ''; const win1 = m.completed && parseInt(m.t1s) > parseInt(m.t2s), win2 = m.completed && parseInt(m.t2s) > parseInt(m.t1s);
+                    const isUn1 = ["Place", "Winner", "Loser"].some(p => m.t1.includes(p)), isUn2 = ["Place", "Winner", "Loser"].some(p => m.t2.includes(p));
+                    let colorClass = "border-gray-100 bg-white";
+                    if (m.label.includes("Qualifier 1") || m.label.includes("SF 1")) colorClass = "border-blue-200 bg-blue-50/30";
+                    if (m.label.includes("Eliminator") || m.label.includes("SF 2")) colorClass = "border-red-200 bg-red-50/30";
+                    if (m.label.includes("Qualifier 2")) colorClass = "border-orange-200 bg-orange-50/30";
+                    if (m.label.includes("Final")) colorClass = "border-yellow-400 bg-yellow-50/50";
+                    return `<div class="relative"><div class="border-2 rounded-xl shadow-sm w-40 overflow-hidden cursor-pointer hover:border-blue-400 transition-all ${colorClass} ${m.completed ? 'opacity-80' : ''}" onclick="app.selectMatch(${m.id})"><div class="bg-black/5 text-[8px] font-bold text-gray-500 uppercase px-2 py-1 border-b">${m.label} ${m.completed ? '✓' : ''}</div><div class="p-2 space-y-1"><div class="flex justify-between items-center"><span class="text-[11px] font-bold truncate flex-1 ${win1 ? 'text-green-600' : (isUn1 ? 'text-gray-300 italic' : 'text-gray-700')}">${m.t1} ${win1 && m.label === 'Final' ? '👑' : ''}</span>${m.completed ? `<span class="text-[9px] font-mono font-bold">${m.t1s}</span>` : ''}</div><div class="flex justify-between items-center"><span class="text-[11px] font-bold truncate flex-1 ${win2 ? 'text-green-600' : (isUn2 ? 'text-gray-300 italic' : 'text-gray-700')}">${m.t2} ${win2 && m.label === 'Final' ? '👑' : ''}</span>${m.completed ? `<span class="text-[9px] font-mono font-bold">${m.t2s}</span>` : ''}</div></div></div></div>`;
+                };
+
+                let graphHTML = '', svgPaths = '';
+                if (tourney.playoffStyle === 'IPL') {
+                    graphHTML = `<div class="playoff-column">${renderBox(sf1)}${renderBox(elim)}</div><div class="playoff-column">${renderBox(q2)}</div><div class="playoff-column items-center">${renderBox(final)}</div>`;
+                    svgPaths = `<path d="M 160 55 L 200 55 Q 210 55 210 80 L 210 140 Q 210 165 220 165 L 260 165" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+                                <path d="M 160 55 L 430 55 Q 460 55 460 140 L 460 165 L 480 165" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4" marker-end="url(#arrow)" />
+                                <path d="M 160 165 L 260 165" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+                                <path d="M 420 165 L 480 165" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />`;
+                } else {
+                    graphHTML = `<div class="playoff-column">${renderBox(sf1)}${renderBox(sf2)}</div><div class="playoff-column items-center">${renderBox(final)}</div>`;
+                    svgPaths = `<path d="M 160 55 L 210 55 Q 230 55 230 110 L 230 165 L 280 165" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+                                <path d="M 160 165 L 280 165" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />`;
+                }
+                return `<div class="bg-white rounded-xl shadow-sm border p-6 overflow-x-auto relative"><h4 class="font-bold text-gray-700 mb-6 flex items-center gap-2">Playoffs Roadmap</h4><div class="bracket-container min-w-[550px]"><svg class="playoff-svg-layer" viewBox="0 0 700 300"><defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8" /></marker></defs>${svgPaths}</svg>${graphHTML}</div></div>`;
+            },
+
+            renderScheduleList: (tourney) => tourney.matches.map(m => {
+                let statusBadge = m.completed ? `<span class="bg-green-100 text-green-700 text-[9px] px-1.5 py-0.5 rounded font-bold uppercase">Done</span>` : (m.inningsStatus ? `<span class="bg-red-100 text-red-600 text-[9px] px-1.5 py-0.5 rounded font-bold animate-pulse uppercase">Live</span>` : `<span class="bg-gray-100 text-gray-500 text-[9px] px-1.5 py-0.5 rounded uppercase">Next</span>`);
+                let scoreDisplay = m.completed || m.inningsStatus ? `<div class="mt-2 text-[10px] flex justify-between border-t pt-2"><div><b>${m.t1s}/${m.t1w}</b> (${m.t1o} ov)</div><div><b>${m.t2s}/${m.t2w}</b> (${m.t2o} ov)</div></div>` : `<div class="text-gray-300 text-[10px] mt-4 text-center italic tracking-widest uppercase">Upcoming</div>`;
+                // Add a dot indicator if match is live or has been started
+                const dotIndicator = (m.inningsStatus || m.completed) ? '<span class="absolute top-2 right-2 w-2 h-2 bg-blue-600 rounded-full shadow-sm"></span>' : '';
+                return `<div onclick="app.selectMatch(${m.id})" class="bg-white border rounded-xl p-3 hover:shadow-md transition-all cursor-pointer relative"><div class="flex justify-between items-start mb-2">${dotIndicator}<span class="text-[9px] font-bold text-gray-300 uppercase truncate max-w-[100px]">${m.label}</span>${statusBadge}</div><div class="flex justify-between items-center px-1"><span class="font-bold text-gray-700 text-xs truncate w-2/5 text-right">${m.t1}</span><span class="text-[8px] text-gray-300 italic mx-1">vs</span><span class="font-bold text-gray-700 text-xs truncate w-2/5 text-left">${m.t2}</span></div>${scoreDisplay}</div>`;
+            }).join(''),
+
+            renderScheduleManager: (tourney) => {
+                const list = tourney.matches.filter(m => m.type === 'League');
+                ui.main.innerHTML = `<div class="bg-white rounded-xl shadow-sm border p-6"><h3 class="font-bold text-lg mb-6 flex items-center gap-2">Rearrange Match Order</h3><div id="schedule-list" class="space-y-3">${list.map((m, i) => `<div class="draggable-item flex items-center gap-4 bg-white p-3 rounded-lg border shadow-sm" draggable="true" data-index="${i}"><i class="fa-solid fa-grip-lines text-gray-300"></i><div class="flex-1"><div class="text-sm font-bold text-gray-800">${m.t1} <span class="text-gray-400 font-normal">vs</span> ${m.t2}</div><input type="text" value="${m.label}" onchange="app.renameMatch(${m.id}, this.value)" class="bg-blue-50 text-[10px] font-bold uppercase px-2 py-0.5 rounded w-32 border-none"></div></div>`).join('')}</div></div>`;
+                ui.setupDragAndDrop();
+            },
+            setupDragAndDrop: () => {
+                const list = document.getElementById('schedule-list'); if (!list) return;
+                list.addEventListener('dragstart', (e) => { e.target.classList.add('dragging'); ui.dragStartIndex = Number(e.target.dataset.index); });
+                list.addEventListener('dragend', (e) => { e.target.classList.remove('dragging'); });
+                list.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    const current = document.querySelector('.dragging');
+                    if (!current) return;
+                    const after = ui.getDragAfterElement(list, e.clientY);
+                    if (after == null) list.appendChild(current);
+                    else list.insertBefore(current, after);
+                });
+                list.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const current = document.querySelector('.dragging');
+                    if (!current) return;
+                    const items = [...list.querySelectorAll('.draggable-item')];
+                    const newIdx = items.indexOf(current);
+                    if (ui.dragStartIndex !== null && newIdx !== -1 && ui.dragStartIndex !== newIdx) {
+                        app.reorderSchedule(ui.dragStartIndex, newIdx);
+                    }
+                });
+            },
+            getDragAfterElement: (c, y) => [...c.querySelectorAll('.draggable-item:not(.dragging)')].reduce((cl, ch) => { const b = ch.getBoundingClientRect(), o = y - b.top - b.height / 2; if (o < 0 && o > cl.offset) return { offset: o, element: ch }; else return cl; }, { offset: Number.NEGATIVE_INFINITY }).element,
+
+            renderCalculator: (tourney) => {
+                if (!tourney) tourney = Store.get().find(t => t.id === app.currentTournamentId);
+                const posK = ["Place", "Winner", "Loser", "Match"];
+                const opts = tourney.matches.filter(m => !m.completed && !posK.some(p => m.t1.includes(p) || m.t2.includes(p))).map(m => `<option value="${m.id}" ${app.selectedMatchId === m.id ? 'selected' : ''}>${m.label}: ${m.t1} vs ${m.t2}</option>`).join('');
+                ui.main.innerHTML = `<div class="bg-white rounded-xl shadow-sm border p-6 md:col-span-2"><h3 class="font-bold text-lg mb-4 flex items-center gap-2">Live Scorer</h3><div class="space-y-6"><div><label class="block text-sm font-semibold mb-1">Select Active Match</label><select id="calc-match-select" class="w-full p-2 border rounded bg-gray-50 shadow-inner" onchange="app.selectMatch(this.value)"><option value="">-- Choose Match --</option>${opts}</select></div><div id="calc-dynamic-content"></div></div></div>`;
+                if (app.selectedMatchId) ui.updateCalculatorState(tourney, app.selectedMatchId);
+            },
+            updateCalculatorState: (tourney, id) => {
+                const container = document.getElementById('calc-dynamic-content');
+                if (!container) return;
+                const match = tourney.matches.find(m => m.id == id); if (!match) return;
+
+                if (!match.inningsStatus) { container.innerHTML = `<div class="bg-blue-50 p-6 rounded-xl border border-blue-100"><h4 class="font-bold mb-4 flex items-center gap-2">Setup Match</h4><div class="grid grid-cols-2 gap-4 mb-4"><div><label class="block text-[10px] font-bold uppercase mb-1">Overs</label><input type="number" id="setup-overs" value="${tourney.maxOvers}" class="w-full p-2 border rounded"></div><div><label class="block text-[10px] font-bold uppercase mb-1">Wickets</label><input type="number" id="setup-wickets" value="10" class="w-full p-2 border rounded"></div></div><div class="mb-6"><label class="block text-[10px] font-bold uppercase mb-2">Batting First</label><div class="flex gap-4"><label class="flex-1 cursor-pointer bg-white p-3 rounded border flex items-center gap-2 transition-colors hover:bg-gray-50"><input type="radio" name="setup-batting" value="t1" checked><span>${match.t1}</span></label><label class="flex-1 cursor-pointer bg-white p-3 rounded border flex items-center gap-2 transition-colors hover:bg-gray-50"><input type="radio" name="setup-batting" value="t2"><span>${match.t2}</span></label></div></div><button onclick="app.startMatchSetup()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg transition-colors hover:bg-blue-700">Start Innings</button></div>`; }
+                else if (match.inningsStatus === 'Innings Break') { const fk = match.battingFirst === 't1' ? 't1s' : 't2s'; container.innerHTML = `<div class="bg-orange-50 p-8 rounded-xl border text-center shadow-inner"><i class="fa-solid fa-mug-hot text-5xl text-orange-400 mb-4 block"></i><h3 class="text-2xl font-bold mb-2 text-orange-900">Innings Break</h3><p class="mb-6 text-orange-800">Target for 2nd Innings: <span class="text-2xl font-bold">${parseInt(match[fk]) + 1}</span></p><button onclick="app.startSecondInnings()" class="bg-orange-600 text-white font-bold py-3 px-12 rounded-xl transition-colors hover:bg-orange-700">Start Second Innings</button></div>`; }
+                else if (match.inningsStatus === 'Completed') {
+                    const posK = ["Place", "Winner", "Loser"];
+                    const nextM = tourney.matches.find(m => !m.completed && m.id !== match.id && !posK.some(p => m.t1.includes(p) || m.t2.includes(p)));
+                    container.innerHTML = `<div class="bg-white rounded-2xl border-4 border-green-500 p-10 text-center shadow-2xl win-card-pop relative overflow-hidden"><i class="fa-solid fa-trophy text-7xl text-yellow-500 mb-6 animate-trophy drop-shadow-lg"></i><h3 class="text-3xl font-black text-green-700 uppercase tracking-tighter mb-2">Match Finished!</h3><div class="text-xl font-bold text-gray-700 mb-10 p-4 bg-green-50 rounded-xl border border-green-100">${match.resultMsg}</div><div class="grid grid-cols-1 gap-4 relative z-10">${nextM ? `<button onclick="app.selectMatch(${nextM.id})" class="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-xl hover:bg-blue-700 transition-all flex items-center justify-center gap-3 active:scale-95">START NEXT MATCH <i class="fa-solid fa-arrow-right"></i></button>` : ''}<button onclick="app.goBack()" class="w-full bg-gray-100 text-gray-700 font-black py-4 rounded-2xl hover:bg-gray-200 transition-all uppercase tracking-widest text-sm text-center">Go to Dashboard</button></div></div>`;
+                } else ui.renderLiveScoringGrid(match);
+            },
+            renderLiveScoringGrid: (match) => {
+                const container = document.getElementById('calc-dynamic-content');
+                if (!container) return;
+                let teamKey = match.inningsStatus === '1st' ? (match.battingFirst === 't1' ? 't1' : 't2') : (match.battingFirst === 't1' ? 't2' : 't1');
+                let battingTeam = match[teamKey], targetDisplay = '';
+                if (match.inningsStatus === '2nd') {
+                    let firstInnTeam = match.battingFirst === 't1' ? 't1' : 't2';
+                    let targetVal = parseInt(match[firstInnTeam + 's']) + 1;
+                    targetDisplay = `<div id="live-need-msg" class="text-[10px] font-bold text-yellow-300 mt-1 uppercase tracking-tighter">Target: ${targetVal} | Need ${targetVal - parseInt(match[teamKey + 's'])} runs in ${(match.maxOvers * 6) - Logic.oversToBalls(match[teamKey + 'o'])} balls</div>`;
+                }
+                const ballOptions = [0, 1, 2, 3, 4, 6, 'W', 'WD', 'NB'];
+                // CHECK: Is current over complete OR innings ends early?
+                const legalBallsCompleted = app.calculateLegalBalls();
+                const maxWickets = match.maxWickets || 10;
+                const totalWickets = parseInt(match[teamKey + 'w'] || 0) + app.scoringState.currentWickets;
+                const isAllOut = totalWickets >= maxWickets;
+
+                // Check if target reached in 2nd innings
+                let targetReached = false;
+                if (match.inningsStatus === '2nd') {
+                    const firstInnTeam = match.battingFirst === 't1' ? 't1' : 't2';
+                    const targetRuns = parseInt(match[firstInnTeam + 's']) + 1;
+                    const currentRuns = parseInt(match[teamKey + 's'] || 0) + app.scoringState.currentRuns;
+                    targetReached = currentRuns >= targetRuns;
+                }
+
+                // RESTRICTION: Disable run selection if match won or all wickets lost
+                const shouldDisableRuns = isAllOut || targetReached;
+
+                const totalBallCount = app.scoringState.currentBalls.length;
+                let ballsHtml = '';
+                for (let i = 0; i < totalBallCount; i++) {
+                    const currentValues = Array.isArray(app.scoringState.currentBalls[i]) ? app.scoringState.currentBalls[i] : [];
+
+                    // Sanitize data: fix invalid WD+NB combinations from legacy saved matches
+                    app.sanitizeDeliveryData(currentValues);
+
+                    const hasWide = currentValues.includes('WD');
+                    const hasNoBall = currentValues.includes('NB');
+
+                    // CREATE: Show a dot indicator if any option is selected for this ball
+                    const hasAnySelection = currentValues.length > 0;
+                    const dotIndicator = hasAnySelection ? '<span class="absolute -top-1 -right-1 w-2 h-2 bg-blue-600 rounded-full shadow-sm"></span>' : '';
+
+                    ballsHtml += `<div class="grid grid-cols-[50px_1fr] gap-2 items-center py-2 border-b last:border-0 border-gray-100 relative"><div class="text-[10px] font-bold text-gray-300 text-center relative">${dotIndicator}BALL ${i + 1}</div><div class="grid grid-cols-9 gap-1">${ballOptions.map(opt => {
+                        // IMPROVED UX: Don't disable checkboxes - let user correct mistakes
+                        // Visual feedback shows user that switching will auto-replace the other
+                        //
+                        // Indicators:
+                        // - Active (WD/NB selected): Normal styling
+                        // - Conflict (other option selected): Faded but STILL CLICKABLE
+                        // - Inactive: Normal styling
+                        // - Disabled for runs: When match won or all wickets lost
+
+                        let needsWarning = false;
+                        if (opt === 'NB' && hasWide) needsWarning = true;   // NB is faded when WD active
+                        if (opt === 'WD' && hasNoBall) needsWarning = true;  // WD is faded when NB active
+
+                        // RESTRICTION: Disable run buttons (0-6) and wickets/extras (W, WD, NB) if match won or all wickets lost
+                        const isRunOption = [0, 1, 2, 3, 4, 6].includes(opt);
+                        const isWicketOrExtra = ['W', 'WD', 'NB'].includes(opt);
+                        const isDisabled = shouldDisableRuns && (isRunOption || isWicketOrExtra);
+                        const disabledAttr = isDisabled ? 'disabled' : '';
+                        const disabledStyle = isDisabled
+                            ? 'style="opacity: 0.4; cursor: not-allowed; pointer-events: none;"'
+                            : '';
+
+                        const warningStyle = needsWarning
+                            ? 'style="opacity: 0.5; cursor: pointer; text-decoration: line-through;"'
+                            : '';
+                        const warningTitle = needsWarning
+                            ? 'title="Click to switch - will replace the other option"'
+                            : '';
+                        const disabledTitle = isDisabled
+                            ? 'title="Match already won or all wickets lost"'
+                            : '';
+
+                        return `<div class="ball-option opt-${opt}"><input type="checkbox" id="b${i}_${opt}" value="${opt}" onchange="app.updateGridScore(${i}, ${typeof opt === 'string' ? `'${opt}'` : opt}, this.checked)" ${currentValues.includes(opt) ? 'checked' : ''} ${disabledAttr}><label for="b${i}_${opt}" ${disabledStyle} ${disabledTitle} ${!isDisabled && warningStyle} ${!isDisabled && warningTitle}>${opt}</label></div>`;
+                    }).join('')}</div></div>`;
+                }
+
+                // CREATE: Linear dot indicator for all balls in current over
+                const dotsHtml = app.scoringState.currentBalls.map((ball, idx) => {
+                    const hasSelection = Array.isArray(ball) && ball.length > 0;
+                    const isCompensationBall = ball === null && idx >= 6;
+                    return `<div class="flex flex-col items-center gap-1"><div class="w-2 h-2 rounded-full transition-all ${hasSelection ? 'bg-green-400 shadow-lg shadow-green-400/50' : 'bg-gray-400'}"></div><span class="text-[8px] font-bold text-gray-300">${idx + 1}${isCompensationBall ? '+' : ''}</span></div>`;
+                }).join('');
+
+                const isOverComplete = legalBallsCompleted >= 6;
+                const canProceed = isOverComplete || isAllOut || targetReached;
+                const ballsRemaining = Math.max(0, 6 - legalBallsCompleted);
+
+                let buttonClass = 'w-full text-white font-bold py-5 rounded-2xl shadow-xl text-lg flex items-center justify-center gap-3 uppercase tracking-widest';
+                let buttonTitle = '';
+                let warningMessage = '';
+
+                if (canProceed) {
+                    buttonClass += ' bg-blue-600 hover:bg-blue-700 transition-all';
+                    if (isAllOut) {
+                        buttonTitle = 'title="All wickets lost - Innings ended"';
+                    } else if (targetReached) {
+                        buttonTitle = 'title="Target reached - Match won!"';
+                    }
+                } else {
+                    buttonClass += ' bg-gray-400 text-gray-600 cursor-not-allowed opacity-70';
+                    buttonTitle = `title="Complete all ${ballsRemaining} remaining ball(s) to proceed"`;
+                    warningMessage = `<div class="text-center text-sm font-semibold text-amber-600 bg-amber-50 p-3 rounded-lg">⚠️ Complete all 6 legal deliveries (${ballsRemaining} remaining)</div>`;
+                }
+
+                container.innerHTML = `<div class="space-y-6"><div class="sticky-score-header bg-blue-900 text-white p-5 rounded-2xl shadow-xl transition-all"><div class="flex justify-between items-start mb-4"><div><div class="text-[10px] text-blue-300 uppercase font-bold">${match.inningsStatus} Innings: ${battingTeam}</div><div class="text-5xl font-bold leading-none" id="live-main-score">${match[teamKey + 's']}/${match[teamKey + 'w']}</div><div class="text-[10px] opacity-80">${match[teamKey + 'o']} Overs</div>${targetDisplay}</div><div class="text-right">THIS OVER<div class="text-3xl font-mono text-yellow-400 font-bold bg-white/10 px-2 rounded mt-1 leading-none pt-1" id="live-this-over">+0</div></div></div><div class="flex gap-3 items-center justify-start overflow-x-auto pb-2">${dotsHtml}</div></div><div class="bg-gray-50 p-4 rounded-xl border"><div class="text-[10px] font-bold text-gray-500 uppercase mb-3 block">Click multiple options per ball</div><div class="space-y-3">${ballsHtml}</div></div><button id="btn-finish-over" onclick="app.finishOver()" class="${buttonClass}" ${buttonTitle} ${!canProceed ? 'disabled' : ''}>${isAllOut ? '🏁 INNINGS ENDED' : (targetReached ? '🎉 MATCH WON' : 'NEXT OVER')} <i class="fa-solid fa-arrow-right"></i></button>${warningMessage}</div>`;
+
+                // Update the display with current totals after rendering
+                ui.updateLiveScoreDisplay();
+            },
+            updateLiveScoreDisplay: () => {
+                const hScore = document.getElementById('live-main-score'), hOver = document.getElementById('live-this-over'), btn = document.getElementById('btn-finish-over'), hNeed = document.getElementById('live-need-msg'); if (!hScore) return;
+                const tourney = Store.get().find(t => t.id === app.currentTournamentId);
+                const match = tourney.matches.find(x => x.id === app.selectedMatchId);
+                let teamKey = (match.inningsStatus === '1st') ? (match.battingFirst === 't1' ? 't1' : 't2') : (match.battingFirst === 't1' ? 't2' : 't1');
+                const totalRuns = parseInt(match[teamKey + 's'] || 0) + app.scoringState.currentRuns;
+                const totalWickets = parseInt(match[teamKey + 'w'] || 0) + app.scoringState.currentWickets;
+                const limitWickets = match.maxWickets || 10;
+
+                hScore.innerText = `${totalRuns}/${totalWickets}`;
+                let scoreDisplay = `+${app.scoringState.currentRuns}`;
+                if (app.scoringState.currentWickets > 0) scoreDisplay += '/' + app.scoringState.currentWickets + 'w';
+                if (app.scoringState.currentWides > 0) scoreDisplay += '/' + app.scoringState.currentWides + 'WD';
+                if (app.scoringState.currentNoballs > 0) scoreDisplay += '/' + app.scoringState.currentNoballs + 'NB';
+                hOver.innerText = scoreDisplay;
+
+                // CRICKET RULES: Calculate balls remaining using only LEGAL deliveries
+                // Wides and No-Balls do NOT count as legal deliveries
+                const legalBallsInCurrentOver = app.calculateLegalBalls();
+                const totalLegalBallsBowled = Logic.oversToBalls(match[teamKey + 'o']) + legalBallsInCurrentOver;
+                const ballsRemaining = (match.maxOvers * 6) - totalLegalBallsBowled;
+
+                if (match.inningsStatus === '2nd') {
+                    const targetTeamKey = (match.battingFirst === 't1') ? 't1' : 't2';
+                    const targetRuns = parseInt(match[targetTeamKey + 's']) + 1;
+                    const needed = targetRuns - totalRuns;
+                    if (hNeed) hNeed.innerText = `Target: ${targetRuns} | Need ${needed < 0 ? 0 : needed} runs in ${ballsRemaining < 0 ? 0 : ballsRemaining} balls`;
+
+                    if (totalRuns >= targetRuns && btn) {
+                        btn.innerHTML = `<span>FINISH MATCH (WON!)</span> <i class="fa-solid fa-trophy"></i>`;
+                        btn.className = "w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-5 rounded-2xl shadow-xl text-lg flex items-center justify-center gap-3 transition-all";
+                    } else if (totalWickets >= limitWickets && btn) {
+                        btn.innerHTML = `<span>FINISH MATCH (ALL OUT)</span> <i class="fa-solid fa-circle-xmark"></i>`;
+                        btn.className = "w-full bg-red-600 hover:bg-red-700 text-white font-bold py-5 rounded-2xl shadow-xl text-lg flex items-center justify-center gap-3 transition-all";
+                    } else if (btn) {
+                        btn.innerHTML = `<span>NEXT OVER</span> <i class="fa-solid fa-arrow-right"></i>`;
+                        btn.className = "w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-5 rounded-2xl shadow-xl text-lg flex items-center justify-center gap-3 transition-all";
+                    }
+                } else if (totalWickets >= limitWickets && btn) {
+                    btn.innerHTML = `<span>FINISH MATCH (ALL OUT)</span> <i class="fa-solid fa-circle-xmark"></i>`;
+                    btn.className = "w-full bg-red-600 hover:bg-red-700 text-white font-bold py-5 rounded-2xl shadow-xl text-lg flex items-center justify-center gap-3 transition-all";
+                } else if (btn) {
+                    btn.innerHTML = `<span>NEXT OVER</span> <i class="fa-solid fa-arrow-right"></i>`;
+                    btn.className = "w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-5 rounded-2xl shadow-xl text-lg flex items-center justify-center gap-3 transition-all";
+                }
+            },
+            closeAlert: () => document.getElementById('alert-modal').classList.add('hidden')
+        };
+
+        app.init();
+    </script>
+</body>
+
+</html>
