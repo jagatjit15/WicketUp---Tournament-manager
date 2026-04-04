@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WicketUp - Cricket Tournament Scorer</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <!-- Tailwind CSS for UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- HTML2Canvas for Image Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- jsPDF and AutoTable for PDF Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="text-gray-800 pb-44">
+
+    <!-- Decorative Background Watermarks -->
+    <div class="background-decor">
+        <div class="watermark-item" style="top: -5%; left: -5%; font-size: 25rem;"><i
+                class="fa-solid fa-cricket-bat-ball"></i></div>
+        <div class="watermark-item" style="top: 40%; right: -10%; font-size: 20rem; transform: rotate(20deg);"><i
+                class="fa-solid fa-medal"></i></div>
+        <div class="watermark-item" style="bottom: -5%; left: 10%; font-size: 18rem; transform: rotate(-45deg);"><i
+                class="fa-solid fa-trophy"></i></div>
+        <div class="watermark-item" style="bottom: 20%; right: 15%; font-size: 22rem; transform: rotate(10deg);">
+            <svg viewBox="0 0 100 100" style="fill: currentColor; width: 1em;">
+                <rect x="20" y="15" width="8" height="70" rx="2" />
+                <path d="M28 15 C 50 15, 50 45, 28 45 M28 45 C 55 45, 55 85, 28 85" fill="none" stroke="currentColor"
+                    stroke-width="8" />
+                <rect x="55" y="15" width="8" height="70" rx="2" />
+                <path d="M63 15 C 85 15, 85 45, 63 45 M63 45 C 90 45, 90 85, 63 85" fill="none" stroke="currentColor"
+                    stroke-width="8" />
+            </svg>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar-sticky text-white h-[72px] sticky top-0 z-50 flex items-center px-6">
+        <div class="max-w-6xl mx-auto flex justify-between items-center w-full">
+            <!-- Logo Section -->
+            <div class="brand-logo" onclick="app.goHome()">
+                <img src="WicketUp_text_logo.png" alt="WicketUp Logo" class="h-12 brightness-0 invert object-contain">
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button id="back-btn" onclick="app.goBack()" class="hidden text-white/70 hover:text-white p-2 transition-colors">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </button>
+                <button onclick="app.goHome()"
+                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-white hover:bg-white/10 hover:text-[var(--brand-blue)] transition-all">
+                    <i class="fa-solid fa-house text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main id="app" class="max-w-6xl mx-auto p-6 min-h-screen relative"></main>
+
+    <!-- Persistent Branding Footer -->
+    <footer class="py-12 flex flex-col items-center justify-center opacity-50">
+        <div class="flex items-center gap-3 mb-1">
+            <div class="w-8 h-8 bg-gray-600 rounded-lg flex items-center justify-center">
+                <span class="text-white font-black text-xs">B</span>
+            </div>
+            <span class="text-sm font-black tracking-widest uppercase text-gray-800">Barik Brothers</span>
+        </div>
+        <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">Precision Scoring Engine</div>
+    </footer>
+
+    <!-- Modal for New Tournament -->
+    <div id="modal-overlay"
+        class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div
+            class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all flex flex-col max-h-[90vh]">
+            <div class="bg-blue-900 p-4 text-white flex justify-between items-center shrink-0">
+                <h3 class="font-bold text-lg">New Tournament</h3>
+                <button onclick="ui.closeModal()"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="p-6 space-y-4 overflow-y-auto hide-scrollbar">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600 mb-1">Tournament Name</label>
+                    <input type="text" id="new-tourney-name"
+                        class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g. Smash Cup 2024">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600 mb-1">Overs Per Innings</label>
+                    <input type="number" id="new-tourney-overs" class="w-full border border-gray-300 rounded-lg p-2"
+                        value="20">
+                </div>
+                <div>
+                    <label
+                        class="block text-sm font-semibold text-gray-600 mb-1 text-blue-900 uppercase tracking-tighter">Final
+                        Playoff Style</label>
+                    <div class="grid grid-cols-2 gap-3 mt-1">
+                        <label class="cursor-pointer group">
+                            <input type="radio" name="new-tourney-format" value="IPL" class="hidden peer" checked>
+                            <div
+                                class="p-3 border-2 rounded-xl text-center peer-checked:border-blue-600 peer-checked:bg-blue-50 transition-all">
+                                <div class="text-xs font-bold uppercase">Eliminator</div>
+                                <div class="text-[9px] text-gray-500">Q1, Elim, Q2, Final</div>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer group">
+                            <input type="radio" name="new-tourney-format" value="Standard" class="hidden peer">
+                            <div
+                                class="p-3 border-2 rounded-xl text-center peer-checked:border-blue-600 peer-checked:bg-blue-50 transition-all">
+                                <div class="text-xs font-bold uppercase">Standard</div>
+                                <div class="text-[9px] text-gray-500">SF1, SF2, Final</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600 mb-1">Teams</label>
+                    <div class="flex gap-2 mb-2">
+                        <input type="text" id="team-input" class="flex-1 border border-gray-300 rounded-lg p-2"
+                            placeholder="Add Team Name" onkeypress="if(event.key === 'Enter') ui.addTeamToList()">
+                        <button onclick="ui.addTeamToList()"
+                            class="bg-green-600 text-white px-4 rounded-lg hover:bg-green-700 transition-colors"><i
+                                class="fa-solid fa-plus"></i></button>
+                    </div>
+                    <div id="team-list-display" class="flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+            <div class="p-6 border-t shrink-0">
+                <button onclick="app.createTournament()"
+                    class="w-full bg-blue-900 text-white font-bold py-3 rounded-lg shadow hover:bg-blue-800 transition-all">Create
+                    Tournament</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Modal UI -->
+    <div id="alert-modal"
+        class="fixed inset-0 bg-black/60 hidden z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all scale-100">
+            <div class="p-6 text-center">
+                <div id="alert-icon"
+                    class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                    <i class="fa-solid fa-info-circle"></i>
+                </div>
+                <h3 id="alert-title" class="text-xl font-bold text-gray-800 mb-2">Notice</h3>
+                <p id="alert-message" class="text-gray-500 mb-6 text-sm"></p>
+                <button onclick="ui.closeAlert()"
+                    class="w-full px-4 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 shadow-lg transition-all">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-confirm-modal"
+        class="fixed inset-0 bg-black bg-opacity-60 hidden z-[60] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden p-6 text-center">
+            <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4"><i
+                    class="fa-solid fa-trash-can text-2xl"></i></div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Delete Tournament?</h3>
+            <div class="flex gap-3 mt-6">
+                <button onclick="ui.closeDeleteModal()"
+                    class="flex-1 px-4 py-3 bg-gray-100 text-gray-700 font-bold rounded-lg hover:bg-gray-200 transition-all">Cancel</button>
+                <button onclick="app.executeDelete()"
+                    class="flex-1 px-4 py-3 bg-red-600 text-white font-bold rounded-lg shadow-lg hover:bg-red-700 transition-all">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unsaved Changes Confirmation Modal -->
+    <div id="unsaved-changes-modal"
+        class="fixed inset-0 bg-black bg-opacity-60 hidden z-[60] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden p-6 text-center">
+            <div
+                class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-warning text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Unsaved Selections</h3>
+            <p class="text-sm text-gray-600 mb-4">The current over has selections that will be <span
+                    class="font-bold text-red-600">RESET</span>. Are you sure you want to go back?</p>
+            <div class="text-xs text-gray-500 bg-amber-50 p-3 rounded-lg mb-4">
+                <strong>⚠️ Warning:</strong> All ball selections, runs, and wickets for this over will be lost.
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button onclick="ui.closeUnsavedModal()"
+                    class="flex-1 px-4 py-3 bg-gray-100 text-gray-700 font-bold rounded-lg hover:bg-gray-200 transition-all">Keep
+                    Scoring</button>
+                <button onclick="app.confirmGoBack()"
+                    class="flex-1 px-4 py-3 bg-red-600 text-white font-bold rounded-lg shadow-lg hover:bg-red-700 transition-all">Discard
+                    & Go Back</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

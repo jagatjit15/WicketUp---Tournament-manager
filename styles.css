@@ -1,0 +1,1363 @@
+:root {
+    --primary-navy: #0a1931;
+    --brand-blue: #3b82f6;
+    --brand-blue-hover: #2563eb;
+    --brand-light: #f8fafc;
+    --surface-white: #ffffff;
+    --border-gray: #e2e8f0;
+}
+
+/* Global Styles */
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #f0f2f5;
+    -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* Redesign UI Specifics */
+.brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.2s;
+}
+
+.brand-logo:active {
+    transform: scale(0.95);
+}
+
+.navbar-sticky {
+    background-color: var(--primary-navy);
+    box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.h-12 {
+    height: 5rem !important;
+}
+
+.nav-link {
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 12px;
+    color: #d1d5db;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.nav-link.active {
+    color: white;
+}
+
+.nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 12px;
+    right: 12px;
+    height: 3px;
+    background-color: #3b82f6;
+    border-radius: 99px;
+}
+
+.hero-banner {
+    background: linear-gradient(135deg, var(--primary-navy) 0%, var(--brand-blue) 100%);
+    border-radius: 24px;
+    padding: 48px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 32px;
+}
+
+.hero-title {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+}
+
+.hero-subtitle {
+    font-size: 16px;
+    opacity: 0.9;
+    margin-bottom: 24px;
+}
+
+.btn-create {
+    background-color: var(--brand-blue);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-create:hover {
+    background-color: #1d4ed8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.section-header {
+    font-size: 14px;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 20px;
+}
+
+.tournament-card {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    border: 1px solid #f3f4f6;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.tournament-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.1);
+}
+
+.card-menu-btn {
+    color: #d1d5db;
+    transition: color 0.2s;
+}
+
+.card-menu-btn:hover {
+    color: #9ca3af;
+}
+
+.card-delete-btn {
+    color: #fca5a5;
+    transition: color 0.2s;
+}
+
+.card-delete-btn:hover {
+    color: #ef4444;
+}
+
+.progress-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+}
+
+.card-progress-outer {
+    width: 100%;
+    height: 6px;
+    background-color: #f3f4f6;
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.card-progress-inner {
+    height: 100%;
+    background-color: #3b82f6;
+    border-radius: 99px;
+    transition: width 0.5s ease-out;
+}
+
+.card-footer-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.footer-val {
+    font-size: 18px;
+    font-weight: 800;
+    color: #111827;
+    line-height: 1.2;
+}
+
+.footer-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #9ca3af;
+}
+
+/* Dashboard Specifics */
+.tab-btn {
+    flex: 1;
+    padding: 16px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: #4b5563;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+}
+
+.tab-btn.active {
+    color: #1d4ed8;
+    border-bottom: 3px solid #1d4ed8;
+}
+
+.dashboard-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-card-header {
+    background-color: var(--primary-navy);
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 14px;
+    font-weight: 800;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.points-table thead {
+    background-color: #f1f5f9;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.points-table th {
+    padding: 14px 8px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Standard Header Colour */
+.points-table thead tr {
+    color: #1e293b;
+}
+
+.points-table th:not([class*="text-"]) {
+    color: #1e293b;
+}
+
+.points-table td {
+    padding: 12px 8px;
+    font-size: 14px;
+    color: #4b5563;
+    border-bottom: 1px solid #f3f4f6;
+    transition: all 0.2s;
+}
+
+.points-table tr:hover td {
+    background-color: #f1f5f9;
+}
+
+.points-table tr.rank-q td {
+    background-color: #dbeafe;
+    color: #1e3a8a;
+}
+
+.points-table tr:nth-child(even):not(.rank-q) td {
+    background-color: #f8fafc;
+}
+
+.points-table tr.rank-q:hover td {
+    background-color: #bfdbfe;
+}
+
+.points-table tr:not(.rank-q):hover td {
+    background-color: #f1f5f9;
+}
+
+.points-table .val-win {
+    color: #10b981;
+    font-weight: 700;
+}
+
+.points-table .val-loss {
+    color: #f43f5e;
+    font-weight: 700;
+}
+
+.points-table .val-pts {
+    color: #1d4ed8;
+    font-weight: 800;
+}
+
+.points-table .val-nrr {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* Playoffs Roadmap Simple Style */
+.playoff-node {
+    background: white;
+    border: 1px solid #374151;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #374151;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    min-width: 140px;
+    text-align: center;
+}
+
+.playoff-connector {
+    border-top: 2px solid #e5e7eb;
+    border-right: 2px solid #e5e7eb;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+/* Match Grid Specifics */
+.match-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.match-card:hover {
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.match-card.draggable-item {
+    cursor: grab;
+}
+
+.match-card.dragging {
+    opacity: 0.4;
+    transform: scale(0.95);
+    border: 2px dashed var(--brand-blue);
+    box-shadow: none;
+}
+
+/* Card drag handle */
+.match-card__drag {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #cbd5e1;
+    font-size: 14px;
+    cursor: grab;
+    z-index: 2;
+}
+
+/* Card status header */
+.match-card__status {
+    width: 100%;
+    text-align: center;
+    padding: 8px 12px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.match-card__status--upcoming {
+    color: #ea580c;
+    background: #fff7ed;
+}
+
+.match-card__status--live {
+    color: #2563eb;
+    background: #eff6ff;
+}
+
+.match-card__status--completed {
+    color: #475569;
+    background: #f1f5f9;
+}
+
+/* Live indicator dot */
+.live-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #22c55e;
+    margin-left: 6px;
+    animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.4); }
+}
+
+/* Card body — teams area */
+.match-card__body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 16px 20px;
+    gap: 8px;
+}
+
+/* Team column */
+.match-card__team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+}
+
+/* Shield badge for team initial */
+.team-shield {
+    width: 52px;
+    height: 58px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.team-shield svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.team-shield__letter {
+    position: relative;
+    z-index: 2;
+    font-size: 22px;
+    font-weight: 900;
+    color: #1e293b;
+}
+
+/* Team name */
+.team-shield__name {
+    font-size: 11px;
+    font-weight: 700;
+    color: #334155;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+/* VS divider */
+.match-card__vs {
+    font-size: 12px;
+    font-weight: 700;
+    color: #94a3b8;
+    flex-shrink: 0;
+    padding: 0 4px;
+}
+
+/* Score display for completed matches */
+.match-card__score {
+    font-size: 16px;
+    font-weight: 900;
+    color: #0f172a;
+    letter-spacing: 2px;
+    margin-top: -4px;
+}
+
+/* Card footer — match label */
+.match-card__footer {
+    width: 100%;
+    text-align: center;
+    padding: 8px 12px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #64748b;
+    letter-spacing: 0.5px;
+}
+
+/* Rename input in manage mode */
+.match-card__rename {
+    width: 100%;
+    text-align: center;
+    padding: 8px 12px;
+    background: #eff6ff;
+    border-top: 1px solid #dbeafe;
+    border: none;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #1e40af;
+    letter-spacing: 0.5px;
+    outline: none;
+}
+
+.match-card__rename:focus {
+    background: #dbeafe;
+}
+
+/* Update button */
+.btn-update {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    padding: 6px 20px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-update:hover {
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+/* Scorer Match Picker Grid */
+.scorer-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    border: 1px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scorer-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+    border-color: #e2e8f0;
+}
+
+.scorer-card__title {
+    font-size: 1.125rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 8px;
+    letter-spacing: -0.025em;
+}
+
+.scorer-card__info {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.scorer-card__btn {
+    width: 100%;
+    background: #0f172a;
+    color: white;
+    font-weight: 700;
+    font-size: 0.875rem;
+    padding: 12px;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.scorer-card__btn:hover {
+    background: #1e293b;
+    transform: scale(1.02);
+}
+
+.scorer-card__btn--continue {
+    background: #2563eb;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+}
+
+.scorer-card__btn--continue:hover {
+    background: #1d4ed8;
+    transform: scale(1.02);
+    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+}
+
+.scorer-card--completed {
+    background: #f8fafc;
+    opacity: 0.8;
+}
+
+.scorer-card__result {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #1e40af;
+    background: #eff6ff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    width: 100%;
+}
+
+
+
+/* Completed Match - Green Highlight */
+.match-card--completed-green {
+    background: #f0fdf4 !important;
+    border-color: #22c55e !important;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15) !important;
+}
+
+.match-card--completed-green .match-card__status--completed {
+    background: #22c55e !important;
+    color: white !important;
+    font-weight: 900 !important;
+}
+
+.match-card--completed-green .match-card__footer {
+    background: #dcfce7 !important;
+    border-color: #bbf7d0 !important;
+    color: #166534 !important;
+}
+
+.team-shield--winner svg path {
+    fill: #22c55e !important;
+    stroke: #166534 !important;
+}
+
+.team-shield--winner .team-shield__letter {
+    color: white !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
+}
+
+/* Setup Match Card - Redesign */
+.setup-card {
+    background: white;
+    padding: 32px;
+    border-radius: 12px;
+}
+
+.setup-card__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 24px;
+}
+
+.setup-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.setup-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.setup-field__label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 8px;
+}
+
+.setup-field__input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #1e293b;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.setup-field__input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.setup-field__sub {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.setup-teams {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.setup-team {
+    flex: 1;
+    position: relative;
+    padding: 24px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    background: white;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.setup-team:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+}
+
+.setup-team.selected {
+    border-color: #2563eb;
+    background: #f0f7ff;
+}
+
+.setup-team__badge {
+    width: 48px;
+    height: 48px;
+    background: #f1f5f9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.setup-team__name {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 1.125rem;
+}
+
+.setup-team__check {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    color: #2563eb;
+    font-size: 1.25rem;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.setup-team.selected .setup-team__check {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.setup-card__btn {
+    width: 100%;
+    margin-top: 40px;
+    background: #2563eb;
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 16px;
+    border-radius: 10px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+}
+
+.setup-card__btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+}
+
+.setup-card__btn:active {
+    transform: translateY(0);
+}
+
+.bracket-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+    padding: 40px 0;
+}
+
+.playoff-column {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    position: relative;
+    z-index: 10;
+}
+
+.playoff-svg-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* Scoring Grid Styles */
+.ball-option input[type="radio"] {
+    display: none;
+}
+
+.ball-option input[type="checkbox"] {
+    display: none;
+}
+
+.ball-option label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background-color: #e5e7eb;
+    color: #374151;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: 2px solid #d1d5db;
+    user-select: none;
+}
+
+.ball-option label:hover {
+    background-color: #d1d5db;
+    border-color: #9ca3af;
+    transform: scale(1.05);
+}
+
+.ball-option input[type="checkbox"]:checked+label {
+    color: white;
+    transform: scale(1.08);
+}
+
+/* Checked state colors for each option */
+.opt-0 input[type="checkbox"]:checked+label {
+    background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+    color: white;
+    border-color: #166534;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.5);
+}
+
+.opt-0 input[type="checkbox"]:checked+label:hover {
+    background: linear-gradient(135deg, #16a34a 0%, #0d6e2a 100%);
+    box-shadow: 0 6px 16px rgba(22, 163, 74, 0.6);
+}
+
+.opt-1 input[type="checkbox"]:checked+label {
+    background: linear-gradient(135deg, #eab308 0%, #b45309 100%);
+    color: white;
+    border-color: #92400e;
+    box-shadow: 0 4px 12px rgba(234, 179, 8, 0.5);
+}
+
+.opt-1 input[type="checkbox"]:checked+label:hover {
+    background: linear-gradient(135deg, #ca8a04 0%, #8b5e09 100%);
+    box-shadow: 0 6px 16px rgba(202, 138, 4, 0.6);
+}
+
+.opt-2 input[type="checkbox"]:checked+label {
+    background: linear-gradient(135deg, #0ea5e9 0%, #075985 100%);
+    color: white;
+    border-color: #0c4a6e;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.5);
+}
+
+.opt-2 input[type="checkbox"]:checked+label:hover {
+    background: linear-gradient(135deg, #0284c7 0%, #0a3d62 100%);
+    box-shadow: 0 6px 16px rgba(2, 132, 199, 0.6);
+}
+
+.opt-3 input[type="checkbox"]:checked+label {
+    background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+    color: white;
+    border-color: #831843;
+    box-shadow: 0 4px 12px rgba(236, 72, 153, 0.5);
+}
+
+.opt-3 input[type="checkbox"]:checked+label:hover {
+    background: linear-gradient(135deg, #db2777 0%, #9d1d54 100%);
+    box-shadow: 0 6px 16px rgba(219, 39, 119, 0.6);
+}
+
+.opt-4 input[type="checkbox"]:checked+label {
+    background: linear-gradient(135deg, #6366f1 0%, #312e81 100%);
+    color: white;
+    border-color: #3730a3;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.5);
+}
+
+.opt-4 input[type="checkbox"]:checked+label:hover {
+    background: linear-gradient(135deg, #4f46e5 0%, #272359 100%);
+    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.6);
+}
+
+.opt-6 input[type="checkbox"]:checked+label {
+    background: linear-gradient(135deg, #d946ef 0%, #86198f 100%);
+    color: white;
+    border-color: #880e4f;
+    box-shadow: 0 4px 12px rgba(217, 70, 239, 0.5);
+}
+
+.opt-6 input[type="checkbox"]:checked+label:hover {
+    background: linear-gradient(135deg, #c026d3 0%, #702a5a 100%);
+    box-shadow: 0 6px 16px rgba(192, 38, 211, 0.6);
+}
+
+.opt-WD input[type="checkbox"]:checked+label {
+    background: linear-gradient(135deg, #f97316 0%, #a16207 100%);
+    color: white;
+    border-color: #92400e;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.5);
+}
+
+.opt-WD input[type="checkbox"]:checked+label:hover {
+    background: linear-gradient(135deg, #ea580c 0%, #7c2d12 100%);
+    box-shadow: 0 6px 16px rgba(234, 88, 12, 0.6);
+}
+
+.opt-NB input[type="checkbox"]:checked+label {
+    background: linear-gradient(135deg, #f97316 0%, #a16207 100%);
+    color: white;
+    border-color: #92400e;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.5);
+}
+
+.opt-NB input[type="checkbox"]:checked+label:hover {
+    background: linear-gradient(135deg, #ea580c 0%, #7c2d12 100%);
+    box-shadow: 0 6px 16px rgba(234, 88, 12, 0.6);
+}
+
+.ball-option input[type="radio"]:checked+label {
+    transform: scale(1.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-color: transparent;
+}
+
+/* Color-coded ball options */
+.opt-0 label {
+    background-color: #f0fdf4;
+    border-color: #86efac;
+    color: #166534;
+    font-weight: 700;
+}
+
+.opt-0 label:hover {
+    background-color: #dcfce7;
+    border-color: #4ade80;
+}
+
+.opt-1 label {
+    background-color: #fef3c7;
+    border-color: #fcd34d;
+    color: #92400e;
+    font-weight: 700;
+}
+
+.opt-1 label:hover {
+    background-color: #fde68a;
+    border-color: #fbbf24;
+}
+
+.opt-2 label {
+    background-color: #dbeafe;
+    border-color: #7dd3fc;
+    color: #0c4a6e;
+    font-weight: 700;
+}
+
+.opt-2 label:hover {
+    background-color: #bfdbfe;
+    border-color: #38bdf8;
+}
+
+.opt-3 label {
+    background-color: #fce7f3;
+    border-color: #f472b6;
+    color: #831843;
+    font-weight: 700;
+}
+
+.opt-3 label:hover {
+    background-color: #fbcfe8;
+    border-color: #ec4899;
+}
+
+.opt-4 label {
+    background-color: #e0e7ff;
+    border-color: #a5b4fc;
+    color: #3730a3;
+    font-weight: 700;
+}
+
+.opt-4 label:hover {
+    background-color: #c7d2fe;
+    border-color: #818cf8;
+}
+
+.opt-6 label {
+    background-color: #fce4ec;
+    border-color: #f06292;
+    color: #880e4f;
+    font-weight: 700;
+}
+
+.opt-6 label:hover {
+    background-color: #f8bbd0;
+    border-color: #ec407a;
+}
+
+.opt-W label {
+    background-color: #fee2e2;
+    border-color: #fca5a5;
+    color: #7f1d1d;
+    font-weight: 800;
+}
+
+.opt-W label:hover {
+    background-color: #fecaca;
+    border-color: #f87171;
+}
+
+.opt-W input[type="checkbox"]:checked+label {
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+    color: white;
+    border-color: #7f1d1d;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5);
+    transform: scale(1.1);
+}
+
+.opt-W input[type="checkbox"]:checked+label:hover {
+    background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
+    box-shadow: 0 6px 16px rgba(185, 28, 28, 0.6);
+}
+
+.opt-WD label {
+    background-color: #fed7aa;
+    border-color: #fdba74;
+    color: #92400e;
+    font-weight: 700;
+}
+
+.opt-WD label:hover {
+    background-color: #fecaca;
+    border-color: #fb923c;
+}
+
+.opt-NB label {
+    background-color: #fed7aa;
+    border-color: #fdba74;
+    color: #92400e;
+    font-weight: 700;
+}
+
+.opt-NB label:hover {
+    background-color: #fecaca;
+    border-color: #fb923c;
+}
+
+/* Disabled state for run options when match won or all wickets lost */
+.ball-option input[type="checkbox"]:disabled+label {
+    background-color: #d1d5db;
+    border-color: #9ca3af;
+    color: #6b7280;
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.ball-option input[type="checkbox"]:disabled+label:hover {
+    background-color: #d1d5db;
+    border-color: #9ca3af;
+    transform: none;
+}
+
+.sticky-score-header {
+    position: sticky;
+    top: 60px;
+    z-index: 30;
+}
+
+/* Creative BB Logo Icon */
+.bb-icon-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%);
+    border-radius: 25%;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.bb-icon-svg {
+    width: 80%;
+    height: 80%;
+    fill: white;
+}
+
+/* Tiled Watermark Background Decor */
+.background-decor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+    opacity: 0.04;
+}
+
+.watermark-item {
+    position: absolute;
+    color: #1e3a8a;
+    transform: rotate(-15deg);
+}
+
+/* Persistent Branding Footer Watermark */
+.bb-persistent-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 15px 0;
+    background: linear-gradient(to top, rgba(243, 244, 246, 1) 70%, rgba(243, 244, 246, 0) 100%);
+    z-index: 40;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bb-watermark-content {
+    opacity: 0.35;
+    transition: all 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    filter: grayscale(1);
+}
+
+body:hover .bb-watermark-content {
+    opacity: 0.9;
+    filter: grayscale(0);
+}
+
+.bb-tagline {
+    font-size: 7px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-top: 4px;
+    color: #1e3a8a;
+}
+
+/* Drag and Drop */
+.draggable-item {
+    cursor: grab;
+    transition: all 0.2s;
+}
+
+.draggable-item.dragging {
+    opacity: 0.5;
+    border: 2px dashed #3b82f6;
+    transform: scale(0.98);
+}
+
+.mini-bracket-box {
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 4px;
+    font-size: 8px;
+    width: 60px;
+    text-align: center;
+    background: white;
+}
+
+/* Premium Roadmap UI Redesign (IPL Style) */
+.roadmap-outer {
+    padding: 40px 0;
+    overflow-x: auto;
+    position: relative;
+    background-color: #f8fafc;
+}
+
+.roadmap-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 100px;
+    min-width: 1000px;
+    padding: 40px;
+    position: relative;
+    z-index: 10;
+}
+
+.roadmap-card {
+    width: 220px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    z-index: 20;
+}
+
+.roadmap-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.roadmap-header {
+    padding: 8px;
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-align: center;
+}
+
+.roadmap-header.blue {
+    background-color: #3b82f6;
+}
+
+.roadmap-header.orange {
+    background-color: #f97316;
+}
+
+.roadmap-header.green {
+    background-color: #22c55e;
+}
+
+.roadmap-header.gold {
+    background-color: #d4af37;
+}
+
+.roadmap-body {
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.roadmap-team-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.roadmap-logo {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 9px;
+    font-weight: 900;
+    flex-shrink: 0;
+}
+
+.roadmap-team-name {
+    font-size: 14px;
+    font-weight: 800;
+    color: #1e293b;
+    text-align: center;
+}
+
+.roadmap-vs {
+    font-size: 11px;
+    font-weight: 600;
+    color: #94a3b8;
+}
+
+.roadmap-date {
+    margin-top: 8px;
+    font-size: 11px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.roadmap-svg-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.roadmap-path {
+    stroke-width: 3;
+    fill: none;
+    stroke-linecap: round;
+}
+
+.roadmap-path.blue {
+    stroke: #3b82f6;
+}
+
+.roadmap-path.green {
+    stroke: #22c55e;
+}
+
+.roadmap-path-label {
+    font-size: 11px;
+    font-weight: 800;
+    fill: #475569;
+}
